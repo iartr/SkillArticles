@@ -8,8 +8,7 @@ import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
 
-class ArticleViewModel(private val articleId: String) :
-    BaseViewModel<ArticleState>(ArticleState()) {
+class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()) {
     private val repository = ArticleRepository
 
     init {
@@ -48,6 +47,7 @@ class ArticleViewModel(private val articleId: String) :
         }
     }
 
+    /* 3 метода, которые используются для подписки на данные */
     // load text from network
     private fun getArticleContent(): LiveData<List<Any>?> {
         return repository.loadArticleContent(articleId)
@@ -62,6 +62,7 @@ class ArticleViewModel(private val articleId: String) :
     private fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?> {
         return repository.loadArticlePersonalInfo(articleId)
     }
+    /* 3 метода, которые используются для подписки на данные */
 
     fun handleUpText() {
         repository.updateSettings(currentState.toAppSettings().copy(isBigText = true))

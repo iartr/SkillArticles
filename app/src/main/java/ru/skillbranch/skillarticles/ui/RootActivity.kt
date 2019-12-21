@@ -30,7 +30,7 @@ class RootActivity : AppCompatActivity() {
 
         val vmFactory = ViewModelFactory("0")
         viewModel = ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)
-        viewModel.observeState(this) { renderUi(it) }
+        viewModel.observeState(this) { articleState -> renderUi(articleState) }
         viewModel.observeNotifications(this) { renderNotifications(it) }
     }
 
@@ -40,14 +40,10 @@ class RootActivity : AppCompatActivity() {
             .setActionTextColor(getColor(R.color.color_accent_dark))
 
         when (notify) {
-            is Notify.TextMessage -> {
-                snackbar.show()
-            }
+            is Notify.TextMessage -> { }
 
             is Notify.ActionMessage -> {
-                snackbar.setAction(notify.actionLabel) {
-                    notify.actionHandler.invoke()
-                }.show()
+                snackbar.setAction(notify.actionLabel) { notify.actionHandler.invoke() }
             }
 
             is Notify.ErrorMessage -> {
@@ -55,20 +51,24 @@ class RootActivity : AppCompatActivity() {
                     setBackgroundTint(getColor(R.color.design_default_color_error))
                     setTextColor(getColor(android.R.color.white))
                     setActionTextColor(getColor(android.R.color.white))
-                    setAction(notify.errLabel) {
-                        notify.errHandler?.invoke()
-                    }
-                }.show()
+                    setAction(notify.errLabel) { notify.errHandler?.invoke() }
+                }
             }
         }
+
+        snackbar.show()
     }
 
+    // Activity/Fragment получает информацию о том, что было совершено действие
+    // А затем поручает обработку ViewModel
     private fun setupSubmenu() {
         btn_text_up.setOnClickListener { viewModel.handleUpText() }
         btn_text_down.setOnClickListener { viewModel.handleDownText() }
         switch_mode.setOnClickListener { viewModel.handleNightMode() }
     }
 
+    // Activity/Fragment получает информацию о том, что было совершено действие
+    // А затем поручает обработку ViewModel
     private fun setupBottombar() {
         btn_like.setOnClickListener { viewModel.handleLike() }
         btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
@@ -76,20 +76,29 @@ class RootActivity : AppCompatActivity() {
         btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
     }
 
-    private fun renderUi(data: ArticleState) {
+    // Как только на Article что-то изменится, тут же будет обработан этот метод
+    // Потому что мы отсюда подписались на изменения
+
+    /**
+     * Пример обработки:
+     * btn_like.click() клик на эту кнопку -> viewModel.handleLike() -> изменяется значение в Model (сейчас - DataHolder) ->
+     -> поскольку во ViewModel мы подписались на изменения Model, то там мы получаем уведомление об изменении ->
+     получили изменения во ViewModel -> Она оповестила View (этот класс)
+     * */
+    private fun renderUi(articleState: ArticleState) {
         // bind submenu state
-        btn_settings.isChecked = data.isShowMenu
-        if (data.isShowMenu) submenu.open() else submenu.close()
+        btn_settings.isChecked = articleState.isShowMenu
+        if (articleState.isShowMenu) submenu.open() else submenu.close()
 
         // bind article person data
-        btn_like.isChecked = data.isLike
-        btn_bookmark.isChecked = data.isBookmark
+        btn_like.isChecked = articleState.isLike
+        btn_bookmark.isChecked = articleState.isBookmark
 
         // bind submenu views
-        switch_mode.isChecked = data.isDarkMode
-        delegate.localNightMode = if (data.isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        switch_mode.isChecked = articleState.isDarkMode
+        delegate.localNightMode = if (articleState.isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
 
-        if (data.isBigText) {
+        if (articleState.isBigText) {
             tv_text_container.textSize = 18f
             btn_text_up.isChecked = true
             btn_text_down.isChecked = false
@@ -100,19 +109,19 @@ class RootActivity : AppCompatActivity() {
         }
 
         // bind content
-        tv_text_container.text = if (data.isLoadingContent) "loading" else data.content.first() as String
+        tv_text_container.text = if (articleState.isLoadingContent) "loading" else articleState.content.first() as String
 
         //bind toolbar
-        toolbar.title = data.title ?: "loading"
-        toolbar.subtitle = data.subtitle ?: "loading"
-        if (data.categoryIcon != null) toolbar.logo = getDrawable(data.categoryIcon as Int)
-
+        toolbar.title = articleState.title ?: "loading"
+        toolbar.subtitle = articleState.subtitle ?: "loading"
+        if (articleState.categoryIcon != null) toolbar.logo = getDrawable(articleState.categoryIcon as Int)
     }
 
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Задаем для логотипа некоторые надстройки
         val logo = if (toolbar.childCount > 2) toolbar.getChildAt(2) as ImageView else null
         logo?.scaleType = ImageView.ScaleType.CENTER_CROP
         (logo?.layoutParams as? Toolbar.LayoutParams)?.let {
