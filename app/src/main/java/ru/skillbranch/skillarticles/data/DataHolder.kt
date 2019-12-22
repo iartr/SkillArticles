@@ -10,7 +10,7 @@ import ru.skillbranch.skillarticles.R
 import java.util.*
 
 object LocalDataHolder {
-    private var isDalay = true
+    private var isDelay = true
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val articleData = MutableLiveData<ArticleData?>(null)
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -20,7 +20,7 @@ object LocalDataHolder {
 
     fun findArticle(articleId: String): LiveData<ArticleData?> {
         GlobalScope.launch {
-            if (isDalay) delay(2000)
+            if (isDelay) delay(2000)
             articleData.postValue(
                 ArticleData(
                     title = "CoordinatorLayout Basic",
@@ -36,7 +36,7 @@ object LocalDataHolder {
 
     fun findArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo?> {
         GlobalScope.launch {
-            if (isDalay) delay(1000)
+            if (isDelay) delay(1000)
             articleInfo.postValue(ArticlePersonalInfo(isBookmark = true))
         }
         return articleInfo
@@ -53,7 +53,7 @@ object LocalDataHolder {
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun disableDelay() {
-        isDalay = false
+        isDelay = false
     }
 }
 
