@@ -113,7 +113,7 @@ class RootActivity : AppCompatActivity() {
 
         //bind toolbar
         toolbar.title = articleState.title ?: "loading"
-        toolbar.subtitle = articleState.subtitle ?: "loading"
+        toolbar.subtitle = articleState.category ?: "loading"
         if (articleState.categoryIcon != null) toolbar.logo = getDrawable(articleState.categoryIcon as Int)
     }
 

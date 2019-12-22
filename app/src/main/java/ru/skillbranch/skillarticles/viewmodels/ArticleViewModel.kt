@@ -123,7 +123,6 @@ data class ArticleState(
     val searchPosition: Int = 0, // Текущая позиция найденного результата
     val shareLink: String? = null, // Ссылка share
     val title: String? = null,
-    val subtitle: String? = null,
     val category: String? = null,
     val categoryIcon: Any? = null,
     val date: String? = null,
