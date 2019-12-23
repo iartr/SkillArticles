@@ -1,12 +1,13 @@
 package ru.skillbranch.skillarticles
 
-import androidx.lifecycle.*
-import androidx.lifecycle.Observer
-import androidx.test.annotation.UiThreadTest
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert.assertEquals
+import com.jraska.livedata.test
+import org.junit.FixMethodOrder
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.MethodSorters
 import ru.skillbranch.skillarticles.data.*
 import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
@@ -14,153 +15,214 @@ import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.Notify
 import java.util.*
 
-
 /**
  * Instrumented test, which will execute on an Android device.
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+    @get:Rule
+    val testRule = InstantTaskExecutorRule()
 
     @Test
-    @UiThreadTest
-    fun viewModel_subscriptions_on_data_source() {
+    fun A_viewModel_subscriptions_on_data_source() {
+        val vm = ArticleViewModel("0")
+
+        vm.state.test()
+            .awaitValue() //load app settings
+            .assertValue { it.isLoadingContent == true }
+            .awaitNextValue() //load article personal info
+            .assertValue { it.isLoadingContent == true && it.isBookmark == true }
+            .awaitNextValue() //load article info
+            .assertValue {
+                it.isLoadingContent == true &&
+                        it.isBookmark == true &&
+                        it.title == "CoordinatorLayout Basic" &&
+                        it.category == "Android" &&
+                        it.author == "Skill-Branch"
+            }
+            .awaitNextValue()//load article content
+            .assertValue {
+                it.isLoadingContent == false &&
+                        it.isBookmark == true &&
+                        it.title == "CoordinatorLayout Basic" &&
+                        it.category == "Android" &&
+                        it.author == "Skill-Branch" &&
+                        it.content.first() == longText
+            }
+            .assertHistorySize(4)
+
+        //change app settings
+        LocalDataHolder.settings.value = AppSettings(isDarkMode = true)
+
+        vm.state.test()
+            .awaitValue()
+            .assertValue { it.isDarkMode == true }
+
+        //change personal info
+        LocalDataHolder.articleInfo.value = ArticlePersonalInfo(isLike = true, isBookmark = false)
+
+        vm.state.test()
+            .awaitValue()
+            .assertValue {
+                it.isLike == true &&
+                        it.isBookmark == false
+            }
+
+        //change article data
         val expectedDate = Date()
-        LocalDataHolder.articleData.value =
-            ArticleData(title = "test article", category = "android", date = expectedDate)
-        val expected = ArticleState(
-            false,
-            true,
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            null,
-            emptyList(),
-            0,
-            null,
-            "test article",
-            "android",
-            null,
-            expectedDate.format(),
-            null,
-            null,
-            emptyList(),
-            emptyList()
+        LocalDataHolder.articleData.value = ArticleData(
+            title = "test title",
+            category = "test",
+            author = "test",
+            shareLink = "any share link",
+            date = expectedDate
         )
 
-        val expectedPass1 = expected.copy(isLike = true, isBookmark = true)
-        val expectedPass2 = expectedPass1.copy(isDarkMode = true)
-        val expectedPass3 = expectedPass2.copy(content = listOf("long long text"), isLoadingContent = false)
+        vm.state.test()
+            .awaitValue()
+            .assertValue {
+                it.title == "test title" &&
+                it.category == "test" &&
+                it.author == "test" &&
+                it.shareLink == "any share link" &&
+                it.date == expectedDate.format()
+            }
 
-        val vm = ArticleViewModel("0")
+        //change content data
+        NetworkDataHolder.content.value = listOf("long long text content")
 
-        vm.state.observeOnce {
-            assertEquals(expected, it)
-        }
-
-        LocalDataHolder.articleInfo.value = ArticlePersonalInfo(isLike = true, isBookmark = true)
-        vm.state.observeOnce {
-            assertEquals(expectedPass1, it)
-        }
-
-        LocalDataHolder.settings.value = AppSettings(isDarkMode = true)
-        vm.state.observeOnce {
-            assertEquals(expectedPass2, it)
-        }
-
-        NetworkDataHolder.content.value = listOf("long long text")
-        vm.state.observeOnce {
-            assertEquals(expectedPass3, it)
-        }
+        vm.state.test()
+            .awaitValue()
+            .assertValue {
+                it.content.first() == "long long text content"
+            }
     }
 
     @Test
-    @UiThreadTest
-    fun viewModel_actions_implementation() {
-        val vm = ArticleViewModel("0")
+    fun B_viewModel_actions_implementation() {
         LocalDataHolder.disableDelay()
+        NetworkDataHolder.disableDelay()
+        val vm = ArticleViewModel("0")
+
+        //load init data
+        vm.state.test()
+            .awaitValue()
+            .assertHasValue()
+
+        //clear state
+        vm.state.value = ArticleState()
+        vm.state.test()
+            .awaitValue()
+            .assertValue(ArticleState())
+
+        //like check
         vm.handleLike()
-        vm.state.observeOnce {
-            assertEquals(true, it.isLike)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue {
+                it.isLike == true
+            }
 
+        vm.notifications
+            .test()
+            .awaitValue()
+            .assertValue {
+                it.peekContent().message == "Mark as liked"
+            }
+
+        //like uncheck
         vm.handleLike()
-        vm.state.observeOnce {
-            assertEquals(false, it.isLike)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isLike == false }
 
+        vm.notifications
+            .test()
+            .awaitValue()
+            .assertValue {
+                val (msg, label, _) = (it.peekContent() as Notify.ActionMessage)
+                msg == "Don`t like it anymore" &&
+                label == "No, still like it"
+            }
+
+        //check Bookmark
         vm.handleBookmark()
-        vm.state.observeOnce {
-            assertEquals(true, it.isBookmark)
-        }
-        vm.notifications.observeOnce {
-            assertEquals("Add to bookmarks", it.peekContent().message)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isBookmark == true }
 
+        vm.notifications
+            .test()
+            .awaitValue()
+            .assertValue {
+                it.peekContent().message == "Add to bookmarks"
+            }
+
+        //uncheck Bookmark
         vm.handleBookmark()
-        vm.state.observeOnce {
-            assertEquals(false, it.isBookmark)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isBookmark == false }
 
+        vm.notifications
+            .test()
+            .awaitValue()
+            .assertValue {
+                it.peekContent().message == "Remove from bookmarks"
+            }
 
         vm.handleUpText()
-        vm.state.observeOnce {
-            assertEquals(true, it.isBigText)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isBigText == true }
 
         vm.handleDownText()
-        vm.state.observeOnce {
-            assertEquals(false, it.isBigText)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isBigText == false }
 
         vm.handleNightMode()
-        vm.state.observeOnce {
-            assertEquals(true, it.isDarkMode)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isDarkMode == true }
+
 
         vm.handleToggleMenu()
-        vm.state.observeOnce {
-            assertEquals(true, it.isShowMenu)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isShowMenu == true }
 
         vm.handleToggleMenu()
-        vm.state.observeOnce {
-            assertEquals(false, it.isShowMenu)
-        }
+        vm.state
+            .test()
+            .awaitValue()
+            .assertValue { it.isShowMenu == false }
 
         vm.handleShare()
-        vm.notifications.observeOnce {
-            assertEquals(
-                Notify.ErrorMessage("Share is not implemented", "OK", null),
-                it.peekContent()
-            )
-        }
-    }
-}
+        vm.notifications
+            .test()
+            .awaitValue()
+            .assertValue {
+                val (msg, label, handler) = (it.peekContent() as Notify.ErrorMessage)
+                msg == "Share is not implemented" &&
+                label == "OK" &&
+                handler == null
 
-class OneTimeObserver<T>(private val handler: (T) -> Unit) :
-    Observer<T>,
-    LifecycleOwner {
-    private val lifecycle = LifecycleRegistry(this)
+            }
 
-    init {
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
     }
 
-    override fun getLifecycle(): Lifecycle = lifecycle
-
-    override fun onChanged(t: T) {
-        handler(t)
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    }
 }
 
-fun <T> LiveData<T>.observeOnce(onChangeHandler: (T) -> Unit) {
-    val observer = OneTimeObserver(handler = onChangeHandler)
-    observe(observer, observer)
-}
+
