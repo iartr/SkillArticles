@@ -50,6 +50,7 @@
         android:theme="@style/ArticleBarsTheme"
         android:visibility="gone"
         app:layout_dodgeInsetEdges="bottom"
+        app:layout_behavior=".ui.custom.behaviors.SubmenuBehavior"
         tools:visibility="visible" />
 
     <ru.skillbranch.skillarticles.ui.custom.Bottombar
@@ -59,6 +60,7 @@
         android:layout_gravity="bottom"
         android:elevation="4dp"
         android:theme="@style/ArticleBarsTheme"
-        app:layout_insetEdge="bottom" />
+        app:layout_insetEdge="bottom"
+        app:layout_behavior=".ui.custom.behaviors.BottombarBehavior"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
