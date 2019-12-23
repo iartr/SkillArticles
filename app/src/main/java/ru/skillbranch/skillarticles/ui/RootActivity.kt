@@ -2,8 +2,11 @@ package ru.skillbranch.skillarticles.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
+import android.view.Menu
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
@@ -34,46 +37,38 @@ class RootActivity : AppCompatActivity() {
         viewModel.observeNotifications(this) { renderNotifications(it) }
     }
 
-    private fun renderNotifications(notify: Notify) {
-        val snackbar = Snackbar.make(coordinator_container, notify.message, Snackbar.LENGTH_LONG)
-            .setAnchorView(bottombar)
-            .setActionTextColor(getColor(R.color.color_accent_dark))
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.article_menu, menu)
 
-        when (notify) {
-            is Notify.TextMessage -> { }
+        val content = viewModel.currentState
+        val actionSearch = menu.findItem(R.id.action_search)
+        val searchView = actionSearch.actionView as SearchView
+        searchView.inputType = InputType.TYPE_CLASS_TEXT
+        searchView.queryHint = getString(R.string.search)
 
-            is Notify.ActionMessage -> {
-                snackbar.setAction(notify.actionLabel) { notify.actionHandler.invoke() }
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.handleSearch(query)
+                return true
             }
 
-            is Notify.ErrorMessage -> {
-                with(snackbar) {
-                    setBackgroundTint(getColor(R.color.design_default_color_error))
-                    setTextColor(getColor(android.R.color.white))
-                    setActionTextColor(getColor(android.R.color.white))
-                    setAction(notify.errLabel) { notify.errHandler?.invoke() }
-                }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.handleSearch(newText)
+                return true
             }
+        })
+
+        searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
+            viewModel.handleSearchMode(hasFocus)
         }
 
-        snackbar.show()
-    }
+        if (content.isSearch) {
+            actionSearch.expandActionView()
+            searchView.requestFocus()
+            searchView.setQuery(content.searchQuery ?: "", false)
+        }
 
-    // Activity/Fragment получает информацию о том, что было совершено действие
-    // А затем поручает обработку ViewModel
-    private fun setupSubmenu() {
-        btn_text_up.setOnClickListener { viewModel.handleUpText() }
-        btn_text_down.setOnClickListener { viewModel.handleDownText() }
-        switch_mode.setOnClickListener { viewModel.handleNightMode() }
-    }
-
-    // Activity/Fragment получает информацию о том, что было совершено действие
-    // А затем поручает обработку ViewModel
-    private fun setupBottombar() {
-        btn_like.setOnClickListener { viewModel.handleLike() }
-        btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
-        btn_share.setOnClickListener { viewModel.handleShare() }
-        btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
+        return super.onCreateOptionsMenu(menu)
     }
 
     // Как только на Article что-то изменится, тут же будет обработан этот метод
@@ -117,6 +112,31 @@ class RootActivity : AppCompatActivity() {
         if (articleState.categoryIcon != null) toolbar.logo = getDrawable(articleState.categoryIcon as Int)
     }
 
+    private fun renderNotifications(notify: Notify) {
+        val snackbar = Snackbar.make(coordinator_container, notify.message, Snackbar.LENGTH_LONG)
+            .setAnchorView(bottombar)
+            .setActionTextColor(getColor(R.color.color_accent_dark))
+
+        when (notify) {
+            is Notify.TextMessage -> { }
+
+            is Notify.ActionMessage -> {
+                snackbar.setAction(notify.actionLabel) { notify.actionHandler.invoke() }
+            }
+
+            is Notify.ErrorMessage -> {
+                with(snackbar) {
+                    setBackgroundTint(getColor(R.color.design_default_color_error))
+                    setTextColor(getColor(android.R.color.white))
+                    setActionTextColor(getColor(android.R.color.white))
+                    setAction(notify.errLabel) { notify.errHandler?.invoke() }
+                }
+            }
+        }
+
+        snackbar.show()
+    }
+
     private fun setupToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -130,5 +150,22 @@ class RootActivity : AppCompatActivity() {
             it.marginEnd = dpToIntPx(10)
             logo.layoutParams = it
         }
+    }
+
+    // Activity/Fragment получает информацию о том, что было совершено действие
+    // А затем поручает обработку ViewModel
+    private fun setupSubmenu() {
+        btn_text_up.setOnClickListener { viewModel.handleUpText() }
+        btn_text_down.setOnClickListener { viewModel.handleDownText() }
+        switch_mode.setOnClickListener { viewModel.handleNightMode() }
+    }
+
+    // Activity/Fragment получает информацию о том, что было совершено действие
+    // А затем поручает обработку ViewModel
+    private fun setupBottombar() {
+        btn_like.setOnClickListener { viewModel.handleLike() }
+        btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
+        btn_share.setOnClickListener { viewModel.handleShare() }
+        btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
     }
 }
