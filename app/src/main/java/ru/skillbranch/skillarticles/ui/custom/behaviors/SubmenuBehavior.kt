@@ -7,6 +7,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 
 class SubmenuBehavior<V: View>(context: Context, attrs: AttributeSet): CoordinatorLayout.Behavior<V>(context, attrs) {
+
     override fun onStartNestedScroll(
         coordinatorLayout: CoordinatorLayout,
         child: V,
@@ -28,6 +29,7 @@ class SubmenuBehavior<V: View>(context: Context, attrs: AttributeSet): Coordinat
         type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
+        child.translationX = maxOf(0f, minOf(child.width.toFloat(), child.translationX + dy))
         child.translationY = maxOf(0f, minOf(child.height.toFloat(), child.translationY + dy))
     }
 }
