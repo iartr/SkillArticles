@@ -85,10 +85,10 @@ class ExampleInstrumentedTest {
             .awaitValue()
             .assertValue {
                 it.title == "test title" &&
-                it.category == "test" &&
-                it.author == "test" &&
-                it.shareLink == "any share link" &&
-                it.date == expectedDate.format()
+                        it.category == "test" &&
+                        it.author == "test" &&
+                        it.shareLink == "any share link" &&
+                        it.date == expectedDate.format()
             }
 
         //change content data
@@ -131,7 +131,7 @@ class ExampleInstrumentedTest {
             .test()
             .awaitValue()
             .assertValue {
-                it.peekContent().message == "Mark as liked"
+                it.peekContent().message == "Mark is liked"
             }
 
         //like uncheck
@@ -147,7 +147,7 @@ class ExampleInstrumentedTest {
             .assertValue {
                 val (msg, label, _) = (it.peekContent() as Notify.ActionMessage)
                 msg == "Don`t like it anymore" &&
-                label == "No, still like it"
+                        label == "No, still like it"
             }
 
         //check Bookmark
@@ -216,8 +216,8 @@ class ExampleInstrumentedTest {
             .assertValue {
                 val (msg, label, handler) = (it.peekContent() as Notify.ErrorMessage)
                 msg == "Share is not implemented" &&
-                label == "OK" &&
-                handler == null
+                        label == "OK" &&
+                        handler == null
 
             }
 
