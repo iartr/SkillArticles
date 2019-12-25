@@ -1,1 +1,1 @@
-<img src="https://skill-branch.ru/uploads/courses/5d889e7aa021130028f1add1/5d88b398019e5a001c21467a/demo_mvvm.gif"/>
+![](https://skill-branch.ru/uploads/courses/5d889e7aa021130028f1add1/5d88b398019e5a001c21467a/demo_mvvm.gif)
