@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
@@ -58,9 +59,17 @@ class RootActivity : AppCompatActivity() {
             }
         })
 
-        searchView.setOnQueryTextFocusChangeListener { v, hasFocus ->
-            viewModel.handleSearchMode(hasFocus)
-        }
+        actionSearch.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                viewModel.handleSearchMode(true)
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                viewModel.handleSearchMode(false)
+                return true
+            }
+        })
 
         if (content.isSearch) {
             actionSearch.expandActionView()
