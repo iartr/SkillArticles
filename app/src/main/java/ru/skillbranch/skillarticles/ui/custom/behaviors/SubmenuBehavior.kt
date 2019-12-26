@@ -5,8 +5,13 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
+import ru.skillbranch.skillarticles.extensions.dpToPx
+import kotlin.math.hypot
 
 class SubmenuBehavior<V: View>(context: Context, attrs: AttributeSet): CoordinatorLayout.Behavior<V>(context, attrs) {
+
+    private var centerX: Float = context.dpToPx(200)
+    private var centerY: Float = context.dpToPx(96)
 
     override fun onStartNestedScroll(
         coordinatorLayout: CoordinatorLayout,
@@ -29,7 +34,9 @@ class SubmenuBehavior<V: View>(context: Context, attrs: AttributeSet): Coordinat
         type: Int
     ) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-        child.translationX = maxOf(0f, minOf(child.width.toFloat(), child.translationX + dy))
-        child.translationY = maxOf(0f, minOf(child.height.toFloat(), child.translationY + dy))
+        if (child.visibility == View.VISIBLE) {
+            child.translationX = maxOf(0f, minOf(hypot(centerX, centerY), child.translationX + dy))
+            child.translationY = maxOf(0f, minOf(hypot(centerX, centerY), child.translationY + dy))
+        }
     }
 }
