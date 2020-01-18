@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_behavior=".ui.custom.behaviors.OverScrollBehavior">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
@@ -68,7 +69,8 @@
         android:src="@drawable/ic_flight_takeoff_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@id/fab"
-        app:layout_anchorGravity="center" />
+        app:layout_anchorGravity="center"
+        app:layout_behavior=".ui.custom.behaviors.HideFabBehaviour" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/mini2"
@@ -77,7 +79,8 @@
         android:src="@drawable/ic_payment_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@id/fab"
-        app:layout_anchorGravity="center" />
+        app:layout_anchorGravity="center"
+        app:layout_behavior=".ui.custom.behaviors.HideFabBehaviour" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/mini3"
@@ -86,7 +89,8 @@
         android:src="@drawable/ic_loyalty_black_24dp"
         app:fabSize="mini"
         app:layout_anchor="@id/fab"
-        app:layout_anchorGravity="center" />
+        app:layout_anchorGravity="center"
+        app:layout_behavior=".ui.custom.behaviors.HideFabBehaviour" />
 
     <ru.skillbranch.skillarticles.ui.custom.ArticleSubmenu
         android:id="@+id/submenu"
