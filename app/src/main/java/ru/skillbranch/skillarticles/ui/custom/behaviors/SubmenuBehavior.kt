@@ -1,42 +1,37 @@
 package ru.skillbranch.skillarticles.ui.custom.behaviors
 
-import android.content.Context
-import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.ViewCompat
-import ru.skillbranch.skillarticles.extensions.dpToPx
-import kotlin.math.hypot
+import androidx.core.view.marginEnd
+import ru.skillbranch.skillarticles.ui.custom.ArticleSubmenu
+import ru.skillbranch.skillarticles.ui.custom.Bottombar
 
-class SubmenuBehavior<V: View>(context: Context, attrs: AttributeSet): CoordinatorLayout.Behavior<V>(context, attrs) {
+class SubmenuBehavior : CoordinatorLayout.Behavior<ArticleSubmenu>() {
 
-    private var centerX: Float = context.dpToPx(200)
-    private var centerY: Float = context.dpToPx(96)
-
-    override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: V,
-        directTargetChild: View,
-        target: View,
-        axes: Int,
-        type: Int
+    override fun layoutDependsOn(
+        parent: CoordinatorLayout,
+        child: ArticleSubmenu,
+        dependency: View
     ): Boolean {
-        return axes == ViewCompat.SCROLL_AXIS_VERTICAL
+        return dependency is Bottombar
     }
 
-    override fun onNestedPreScroll(
-        coordinatorLayout: CoordinatorLayout,
-        child: V,
-        target: View,
-        dx: Int,
-        dy: Int,
-        consumed: IntArray,
-        type: Int
-    ) {
-        super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
-        if (child.visibility == View.VISIBLE) {
-            child.translationX = maxOf(0f, minOf(hypot(centerX, centerY), child.translationX + dy))
-            child.translationY = maxOf(0f, minOf(hypot(centerX, centerY), child.translationY + dy))
+    override fun onDependentViewChanged(
+        parent: CoordinatorLayout,
+        child: ArticleSubmenu,
+        dependency: View
+    ): Boolean {
+        if (child.isOpen && dependency is Bottombar && dependency.translationY >= 0) {
+            animate(child, dependency)
+            return true
         }
+        return false
+    }
+
+    private fun animate(child: ArticleSubmenu, dependency: Bottombar) {
+        val fraction = dependency.translationY / dependency.minHeight
+        child.translationX = (child.width + child.marginEnd) * fraction
+        Log.e("SubmenuBehaviour", "fraction: $fraction translationX: ${child.translationX}")
     }
 }

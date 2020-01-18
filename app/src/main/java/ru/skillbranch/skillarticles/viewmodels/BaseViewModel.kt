@@ -48,10 +48,7 @@ abstract class BaseViewModel<T>(initState: T): ViewModel() {
      * лямбда принимает новые данные и текущее состояние ViewModel в качестве аргументов,
      * изменяет его и возвращает модифицированное состояние, которое устанавливается как текущее
      */
-    protected fun <S> subscribeOnDataSource(
-        source: LiveData<S>,
-        onChanged: (newValue: S, currentState: T) -> T?
-    ) {
+    protected fun <S> subscribeOnDataSource(source: LiveData<S>, onChanged: (newValue: S, currentState: T) -> T?) {
         state.addSource(source) {
             state.value = onChanged(it, currentState) ?: return@addSource
         }
@@ -69,7 +66,7 @@ class ViewModelFactory(private val params: String) : ViewModelProvider.Factory {
 }
 
 class Event<out E>(private val content: E) {
-    var hasBeenHandled = false
+    private var hasBeenHandled = false
 
     /***
      * возвращает контент который еще не был обработан иначе null
