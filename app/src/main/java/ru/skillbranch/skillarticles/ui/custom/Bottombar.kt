@@ -14,6 +14,7 @@ class Bottombar @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), CoordinatorLayout.AttachedBehavior {
+    var isClose = true
 
     override fun getBehavior(): CoordinatorLayout.Behavior<*> {
         return BottombarBehavior()
