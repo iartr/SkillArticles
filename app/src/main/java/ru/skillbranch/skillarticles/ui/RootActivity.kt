@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.ui
 
+import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
 import android.text.SpannableString
@@ -38,15 +39,12 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
-    override val binding: Binding by lazy { ArticleBinding() }
+    override val binding: ArticleBinding by lazy { ArticleBinding() }
     override val layout: Int = R.layout.activity_root
     override val viewModel: ArticleViewModel by lazy {
         val vmFactory = ViewModelFactory("0")
         ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)
     }
-
-    private var isSearching = false
-    private var searchQuery: String? = null
 
     private val bgColor by AttrValue(R.attr.colorSecondary)
     private val fgColor by AttrValue(R.attr.colorOnSecondary)
@@ -57,10 +55,10 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         val searchView = menuItem.actionView as SearchView
         searchView.queryHint = getString(R.string.article_search_placeholder)
 
-        if (isSearching) {
+        if (binding.isSearching) {
             menuItem.expandActionView()
-            searchView.setQuery(searchQuery, false)
-            searchView.clearFocus()
+            searchView.setQuery(binding.searchQuery, false)
+            if (binding.isFocusedSearch) searchView.requestFocus() else searchView.clearFocus()
         }
 
         menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
@@ -221,6 +219,10 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     // inner - имеет доступ к полям и методам внешнего класса
     inner class ArticleBinding: Binding() {
+        var isFocusedSearch = false
+        var isSearching = false
+        var searchQuery: String? = null
+
         private var isLoadingContent: Boolean by ObserveProp(true)
 
         private var isLike: Boolean by RenderProp(false) { btn_like.isChecked = it }
@@ -302,6 +304,14 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
             searchQuery = data.searchQuery
             searchPosition = data.searchPosition
             searchResults = data.searchResults
+        }
+
+        override fun saveUi(outState: Bundle) {
+            outState.putBoolean(::isFocusedSearch.name, search_view?.hasFocus() ?: false)
+        }
+
+        override fun restoreUi(savedState: Bundle) {
+            isFocusedSearch = savedState.getBoolean(::isFocusedSearch.name)
         }
     }
 }
