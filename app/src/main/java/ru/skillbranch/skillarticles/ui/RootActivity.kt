@@ -1,6 +1,5 @@
 package ru.skillbranch.skillarticles.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -13,38 +12,30 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
 import kotlinx.android.synthetic.main.layout_submenu.*
+import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
+import ru.skillbranch.skillarticles.extensions.setMarginOptionally
+import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
+class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
-class RootActivity : AppCompatActivity() {
+    override val layout: Int = R.layout.activity_root
+    override lateinit var viewModel: ArticleViewModel
 
-    private lateinit var viewModel: ArticleViewModel
     private var isSearching = false
     private var searchQuery: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_root)
-        setupToolbar()
-        setupBottombar()
-        setupSubmenu()
 
         val vmFactory = ViewModelFactory("0")
         viewModel = ViewModelProviders.of(this, vmFactory).get(ArticleViewModel::class.java)
-        viewModel.observeState(this) { articleState ->
-            renderUi(articleState)
-
-            //restore search mode
-            if (articleState.isSearch) {
-                isSearching = true
-                searchQuery = articleState.searchQuery
-            }
-        }
+        viewModel.observeState(this) { articleState -> renderUi(articleState) }
         viewModel.observeNotifications(this) { renderNotifications(it) }
     }
 
@@ -87,6 +78,34 @@ class RootActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun setupViews() {
+        setupToolbar()
+        setupBottombar()
+        setupSubmenu()
+    }
+
+    override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun renderSearchPosition(searchPosition: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun clearSearchResult() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun showSearchBar() {
+        bottombar.setSearchState(true)
+        scroll.setMarginOptionally(bottom = dpToIntPx(56))
+    }
+
+    override fun hideSearchBar() {
+        bottombar.setSearchState(false)
+        scroll.setMarginOptionally(bottom = dpToIntPx(0))
+    }
+
     // Как только на Article что-то изменится, тут же будет обработан этот метод
     // Потому что мы отсюда подписались на изменения
 
@@ -97,6 +116,8 @@ class RootActivity : AppCompatActivity() {
      получили изменения во ViewModel -> Она оповестила View (этот класс)
      * */
     private fun renderUi(articleState: ArticleState) {
+        if (articleState.isSearch) showSearchBar() else hideSearchBar()
+
         // bind submenu state
         btn_settings.isChecked = articleState.isShowMenu
         if (articleState.isShowMenu) submenu.open() else submenu.close()
@@ -183,5 +204,20 @@ class RootActivity : AppCompatActivity() {
         btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
         btn_share.setOnClickListener { viewModel.handleShare() }
         btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
+
+        btn_result_up.setOnClickListener {
+            if (search_view.hasFocus()) search_view.clearFocus()
+            viewModel.handleUpResult()
+        }
+
+        btn_result_down.setOnClickListener {
+            if (search_view.hasFocus()) search_view.clearFocus()
+            viewModel.handleDownResult()
+        }
+
+        btn_search_close.setOnClickListener {
+            viewModel.handleSearchMode(false)
+            invalidateOptionsMenu()
+        }
     }
 }
