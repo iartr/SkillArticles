@@ -1,4 +1,3 @@
-/*
 package ru.skillbranch.skillarticles
 
 import android.text.Spannable
@@ -32,14 +31,6 @@ import ru.skillbranch.skillarticles.ui.custom.SearchFocusSpan
 import ru.skillbranch.skillarticles.ui.custom.SearchSpan
 import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import java.lang.Thread.sleep
-
-
-*/
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- *//*
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
@@ -349,4 +340,3 @@ class ExampleInstrumentedTest {
 }
 
 
-*/
