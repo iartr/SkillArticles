@@ -1,7 +1,6 @@
 package ru.skillbranch.skillarticles
 
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Test
 import ru.skillbranch.skillarticles.markdown.Element
 import ru.skillbranch.skillarticles.markdown.MarkdownParser
@@ -16,6 +15,11 @@ class ExampleUnitTest {
     fun parse_list_item() {
         val result = MarkdownParser.parse(unorderedListString)
         val actual = prepare<Element.UnorderedListItem>(result.elements)
+
+        printResults(actual)
+        println()
+        printElements(result.elements)
+
         assertEquals(expectedUnorderedList, actual)
     }
 
@@ -135,8 +139,6 @@ class ExampleUnitTest {
         assertEquals(markdownOptionallyClearString, result)
     }
 
-    //optionally (delete @Ignore fo run)
-//    @Ignore
     @Test
     fun parse_all_with_optionally() {
         val result = MarkdownParser.parse(markdownString)
@@ -183,6 +185,7 @@ class ExampleUnitTest {
         }
     }
 
+    // Развернуть все дочерние элементы у текущего элемента
     private fun Element.spread(): List<Element> {
         val elements = mutableListOf<Element>()
         elements.add(this)
@@ -190,21 +193,22 @@ class ExampleUnitTest {
         return elements
     }
 
+    // Развернуть все дочерние элементы у текущего элемента
     private fun List<Element>.spread(): List<Element> {
         val elements = mutableListOf<Element>()
         if (this.isNotEmpty()) elements.addAll(
-            this.fold(mutableListOf()) { acc, el -> acc.also { it.addAll(el.spread()) } }
+            this.fold(mutableListOf()) { list, element -> list.also { it.addAll(element.spread()) } }
         )
         return elements
     }
 
     private inline fun <reified T : Element> prepare(list: List<Element>): List<String> {
         return list
-            .fold(mutableListOf<Element>()) { acc, el ->
+            .fold(mutableListOf<Element>()) { acc, element ->
                 //spread inner elements
-                acc.also { it.addAll(el.spread()) }
+                acc.also { it.addAll(element.spread()) }
             }
-            .filterIsInstance<T>() //filter only expected instance
-            .map { it.text.toString() } //transform to element text
+            .filterIsInstance<T>() // filter only expected instance
+            .map { it.text.toString() } // transform to element text
     }
 }

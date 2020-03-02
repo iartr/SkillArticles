@@ -232,9 +232,9 @@ Unordered list can use double asterisks or double underscores for emphasis aka b
 Use minuses for list item and underscores and asterisks for emphasis aka italic
 Or use plus for list item and double tildes for strike
 
-1. First ordered list item
-2. Second item
-3. Third item.
+First ordered list item
+Second item
+Third item.
 
 Blockquotes are very handy in email to emulate reply text.
 This line is part of the same quote.
@@ -245,12 +245,12 @@ not` work only inline
 simple single line 
 
 Use ``` for wrap block code
-```code block.code block.code block```
+code block.code block.code block
 also it work for multiline code block 
-```multiline code block
 multiline code block
 multiline code block
-multiline code block```
+multiline code block
+multiline code block
 Use three underscore character _ in new line for horizontal divider
  
 or three asterisks
