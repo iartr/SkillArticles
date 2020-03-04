@@ -12,20 +12,20 @@ import androidx.annotation.VisibleForTesting
 
 class IconLinkSpan(
     private val linkDrawable: Drawable,
-    @ColorInt
-    private val iconColor: Int,
-    @Px
-    private val padding: Float,
-    @ColorInt
-    private val textColor: Int,
+    @ColorInt private val iconColor: Int,
+    @Px private val padding: Float,
+    @ColorInt private val textColor: Int,
     dotWidth: Float = 6f
 ) : ReplacementSpan() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var iconSize = 0
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var textWidth = 0f
+
     private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var path = Path()
 
@@ -41,8 +41,8 @@ class IconLinkSpan(
         paint: Paint
     ) {
         val textStart= x + iconSize + padding
-        paint.forLine { // подч
-            path.reset() // сбрасываем
+        paint.forLine {
+            path.reset()
             path.moveTo(textStart, bottom.toFloat()) // Смещаемся до позиции после иконки
             path.lineTo(textStart + textWidth, bottom.toFloat()) // Линия до конца текста
             canvas.drawPath(path, paint)
@@ -50,7 +50,7 @@ class IconLinkSpan(
 
         paint.forIcon {
             canvas.save()
-            val trY =  bottom - linkDrawable.bounds.bottom
+            val trY = bottom - linkDrawable.bounds.bottom
             canvas.translate(x, trY.toFloat())
             linkDrawable.draw(canvas)
             canvas.restore()
@@ -87,9 +87,8 @@ class IconLinkSpan(
         style = Paint.Style.STROKE // просто линия
         strokeWidth = 0f
 
-
         block()
-        // Восстановим старый цвет - чтобы bullet цветом не продолжил рисовать прочие элементы
+
         color = oldColor
         style = oldStyle
         strokeWidth = oldWidth

@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.mockito.Mockito.*
 import ru.skillbranch.skillarticles.markdown.spans.*
 
 @RunWith(AndroidJUnit4::class)
@@ -33,10 +34,10 @@ class MarkdownBuilderTest {
         val lbottom = 80 // line bottom
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
-        val layout = Mockito.mock(Layout::class.java)
+        val canvas = mock(Canvas::class.java)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
+        val layout = mock(Layout::class.java)
 
         val text = SpannableString("text")
 
@@ -54,7 +55,7 @@ class MarkdownBuilderTest {
         )
 
         // check order call
-        val inOrder = Mockito.inOrder(paint, canvas)
+        val inOrder = inOrder(paint, canvas)
         //check first set color to paint
         inOrder.verify(paint).color = color
         //check draw circle bullet
@@ -83,10 +84,10 @@ class MarkdownBuilderTest {
         val lbottom = 80 //line bottom
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
-        val layout = Mockito.mock(Layout::class.java)
+        val canvas = mock(Canvas::class.java)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
+        val layout = mock(Layout::class.java)
 
         val text = SpannableString("text")
 
@@ -104,7 +105,7 @@ class MarkdownBuilderTest {
         )
 
         //check order call
-        val inOrder = Mockito.inOrder(paint, canvas)
+        val inOrder = inOrder(paint, canvas)
         //check first set color to paint
         inOrder.verify(paint).color = color
         inOrder.verify(paint).strokeWidth = lineWidth
@@ -141,14 +142,14 @@ class MarkdownBuilderTest {
 
         for (level in levels){
             //mocks
-            val canvas = Mockito.mock(Canvas::class.java)
-            Mockito.`when`(canvas.width).thenReturn(canvasWidth)
-            val paint = Mockito.mock(Paint::class.java)
-            Mockito.`when`(paint.color).thenReturn(defaultColor)
-            val measurePaint = Mockito.mock(TextPaint::class.java)
-            val drawPaint = Mockito.mock(TextPaint::class.java)
-            val layout = Mockito.mock(Layout::class.java)
-            val fm = Mockito.mock(Paint.FontMetricsInt::class.java)
+            val canvas = mock(Canvas::class.java)
+            `when`(canvas.width).thenReturn(canvasWidth)
+            val paint = mock(Paint::class.java)
+            `when`(paint.color).thenReturn(defaultColor)
+            val measurePaint = mock(TextPaint::class.java)
+            val drawPaint = mock(TextPaint::class.java)
+            val layout = mock(Layout::class.java)
+            val fm = mock(Paint.FontMetricsInt::class.java)
             fm.ascent = defaultAscent
             fm.descent = defaultDescent
 
@@ -188,7 +189,7 @@ class MarkdownBuilderTest {
                 true, layout
             )
 
-            val inOrder = Mockito.inOrder(paint, canvas)
+            val inOrder = inOrder(paint, canvas)
 
             if (level == 1 || level == 2){
                 inOrder.verify(paint).color = lineColor
@@ -216,10 +217,10 @@ class MarkdownBuilderTest {
         val lbottom = 80 //line bottom
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        Mockito.`when`(canvas.width).thenReturn(canvasWidth)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
+        val canvas = mock(Canvas::class.java)
+        `when`(canvas.width).thenReturn(canvasWidth)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
 
         val text = SpannableString("text")
 
@@ -229,7 +230,7 @@ class MarkdownBuilderTest {
         //check draw rule line
         span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrder = Mockito.inOrder(paint, canvas)
+        val inOrder = inOrder(paint, canvas)
 
         inOrder.verify(paint).color = color
 
@@ -262,18 +263,18 @@ class MarkdownBuilderTest {
         val lbottom = 80 //line bottom
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        Mockito.`when`(canvas.width).thenReturn(canvasWidth)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
-        Mockito.`when`(
+        val canvas = mock(Canvas::class.java)
+        `when`(canvas.width).thenReturn(canvasWidth)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
+        `when`(
             paint.measureText(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.anyInt(),
                 ArgumentMatchers.anyInt()
             )
         ).thenReturn(measureText)
-        val fm = Mockito.mock(Paint.FontMetricsInt::class.java)
+        val fm = mock(Paint.FontMetricsInt::class.java)
 
         val text = SpannableString("text")
 
@@ -284,11 +285,10 @@ class MarkdownBuilderTest {
         val size = span.getSize(paint, text, 0, text.length, fm)
         Assert.assertEquals((2 * padding + measureText).toInt(), size)
 
-
         //check draw inline code
         span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrder = Mockito.inOrder(paint, canvas)
+        val inOrder = inOrder(paint, canvas)
 
         //check draw background
         inOrder.verify(paint).color = bgColor
@@ -324,24 +324,24 @@ class MarkdownBuilderTest {
         val lbottom = 80 //line bottom
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        Mockito.`when`(canvas.width).thenReturn(canvasWidth)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
-        Mockito.`when`(
+        val canvas = mock(Canvas::class.java)
+        `when`(canvas.width).thenReturn(canvasWidth)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
+        `when`(
             paint.measureText(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.anyInt(),
                 ArgumentMatchers.anyInt()
             )
         ).thenReturn(measureText)
-        val fm = Mockito.mock(Paint.FontMetricsInt::class.java)
+        val fm = mock(Paint.FontMetricsInt::class.java)
         fm.ascent = defaultAscent
         fm.descent = defaultDescent
 
         //spy
-        val linkDrawable: Drawable = Mockito.spy(VectorDrawable())
-        val path: Path = Mockito.spy(Path())
+        val linkDrawable: Drawable = spy(VectorDrawable())
+        val path: Path = spy(Path())
 
         val text = SpannableString("text")
 
@@ -360,7 +360,7 @@ class MarkdownBuilderTest {
         //check draw icon and text
         span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrder = Mockito.inOrder(paint, canvas, path, linkDrawable)
+        val inOrder = inOrder(paint, canvas, path, linkDrawable)
 
         //check path effect
         Mockito.verify(paint, Mockito.atLeastOnce()).pathEffect = Mockito.any()
@@ -369,8 +369,8 @@ class MarkdownBuilderTest {
 
         //check reset path
         inOrder.verify(path).reset() //check reset before draw
-        Mockito.verify(path).moveTo(cml + span.iconSize + padding, lbottom.toFloat())
-        Mockito.verify(path).lineTo(cml + span.iconSize + padding + span.textWidth, lbottom.toFloat())
+        verify(path).moveTo(cml + span.iconSize + padding, lbottom.toFloat())
+        verify(path).lineTo(cml + span.iconSize + padding + span.textWidth, lbottom.toFloat())
 
         //check draw path
         inOrder.verify(canvas).drawPath(path, paint)
@@ -412,10 +412,10 @@ class MarkdownBuilderTest {
         val lbottom = 80 //line bottom
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
-        val layout = Mockito.mock(Layout::class.java)
+        val canvas = mock(Canvas::class.java)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
+        val layout = mock(Layout::class.java)
 
         val text = SpannableString("text")
 
@@ -433,7 +433,7 @@ class MarkdownBuilderTest {
         )
 
         //check order call
-        val inOrder = Mockito.inOrder(paint, canvas)
+        val inOrder = inOrder(paint, canvas)
         //check first set color to paint
         inOrder.verify(paint).color = color
         //check draw circle bullet
@@ -467,14 +467,14 @@ class MarkdownBuilderTest {
 
 
         //mocks
-        val canvas = Mockito.mock(Canvas::class.java)
-        Mockito.`when`(canvas.width).thenReturn(canvasWidth)
-        val paint = Mockito.mock(Paint::class.java)
-        Mockito.`when`(paint.color).thenReturn(defaultColor)
-        Mockito.`when`(paint.ascent()).thenReturn(defaultAscent * 0.85f)
-        Mockito.`when`(paint.descent()).thenReturn(defaultDescent * 0.85f)
-        val fm = Mockito.mock(Paint.FontMetricsInt::class.java)
-        val path = Mockito.spy(Path())
+        val canvas = mock(Canvas::class.java)
+        `when`(canvas.width).thenReturn(canvasWidth)
+        val paint = mock(Paint::class.java)
+        `when`(paint.color).thenReturn(defaultColor)
+        `when`(paint.ascent()).thenReturn(defaultAscent * 0.85f)
+        `when`(paint.descent()).thenReturn(defaultDescent * 0.85f)
+        val fm = mock(Paint.FontMetricsInt::class.java)
+        val path = spy(Path())
 
         val text = SpannableString("text")
 
@@ -493,7 +493,7 @@ class MarkdownBuilderTest {
 
         span.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrder = Mockito.inOrder(paint, canvas)
+        val inOrder = inOrder(paint, canvas)
 
         inOrder.verify(paint).color = bgColor
         inOrder.verify(canvas).drawRoundRect(
@@ -527,7 +527,7 @@ class MarkdownBuilderTest {
 
         spanStart.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrderStart = Mockito.inOrder(paint, canvas, path)
+        val inOrderStart = inOrder(paint, canvas, path)
 
         inOrderStart.verify(paint).color = bgColor
 
@@ -564,7 +564,7 @@ class MarkdownBuilderTest {
 
         spanMiddle.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrderMiddle = Mockito.inOrder(paint, canvas)
+        val inOrderMiddle = inOrder(paint, canvas)
 
         inOrderMiddle.verify(paint).color = bgColor
         inOrderMiddle.verify(canvas).drawRect(
@@ -592,7 +592,7 @@ class MarkdownBuilderTest {
 
         spanEnd.draw(canvas, text, 0, text.length, cml.toFloat(), ltop, lbase, lbottom, paint)
 
-        val inOrderEnd = Mockito.inOrder(paint, canvas, path)
+        val inOrderEnd = inOrder(paint, canvas, path)
 
         inOrderEnd.verify(paint).color = bgColor
         inOrderEnd.verify(path).reset()
