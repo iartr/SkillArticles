@@ -190,7 +190,7 @@ class MarkdownBuilderTest {
 
             val inOrder = Mockito.inOrder(paint, canvas)
 
-            if(level == 1 || level ==2){
+            if (level == 1 || level == 2){
                 inOrder.verify(paint).color = lineColor
                 val lh = (paint.descent() - paint.ascent()) * span.sizes[level]!!
                 val lineOffset = lbase + lh * span.linePadding

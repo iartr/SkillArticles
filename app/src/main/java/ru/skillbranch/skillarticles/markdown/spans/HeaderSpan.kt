@@ -29,7 +29,9 @@ class HeaderSpan constructor(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val linePadding = 0.4f
+
     private var originAscent = 0
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val sizes = mapOf(
         1 to 2f,
@@ -40,6 +42,11 @@ class HeaderSpan constructor(
         6 to 0.85f
     )
 
+    override fun getLeadingMargin(first: Boolean): Int {
+        return 0
+    }
+
+    // Работа с fontMetrics
     override fun chooseHeight(
         text: CharSequence?,
         start: Int,
@@ -70,21 +77,24 @@ class HeaderSpan constructor(
         fm.bottom = fm.descent
     }
 
+    // Переопределение размера шрифта
     override fun updateMeasureState(paint: TextPaint) {
         with(paint) {
-            textSize *= sizes.getOrElse(level) { 1f } // переопределим размер шрифта
+            textSize *= sizes.getOrElse(level) { 1f }
             isFakeBoldText = true
         }
     }
 
-    override fun updateDrawState(tp: TextPaint) { // дергается для отрисовки шрифта
+    // Отрисовка шрифта
+    override fun updateDrawState(tp: TextPaint) {
         with(tp) {
-            textSize *= sizes.getOrElse(level) { 1f } // переопределим размер шрифта
+            textSize *= sizes.getOrElse(level) { 1f }
             isFakeBoldText = true
             color = textColor
         }
     }
 
+    // Отрисовка на уровне параграфа
     override fun drawLeadingMargin(
         canvas: Canvas, paint: Paint, currentMarginLocation: Int, paragraphDirection: Int,
         lineTop: Int, lineBaseline: Int, lineBottom: Int, text: CharSequence?, lineStart: Int,
@@ -106,21 +116,17 @@ class HeaderSpan constructor(
         //canvas.drawFontLines(lineTop, lineBottom, lineBaseline, paint)
     }
 
-    override fun getLeadingMargin(first: Boolean): Int {
-        return 0
-    }
-
     private inline fun Paint.forLine(block: () -> Unit) {
         val oldColor = color
         val oldStyle = style
         val oldWidth = strokeWidth
 
         color = dividerColor
-        style = Paint.Style.STROKE // просто линия
+        style = Paint.Style.STROKE
         strokeWidth = 0f
 
         block()
-        // Восстановим старый цвет - чтобы bullet цветом не продолжил рисовать прочие элементы
+
         color = oldColor
         style = oldStyle
         strokeWidth = oldWidth
