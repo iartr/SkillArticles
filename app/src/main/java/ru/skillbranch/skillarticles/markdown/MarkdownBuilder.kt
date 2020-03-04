@@ -50,7 +50,10 @@ class MarkdownBuilder(context: Context) {
                 }
 
                 is Element.Quote -> {
-                    inSpans(BlockquotesSpan(gap, strikeWidth, colorSecondary), StyleSpan(Typeface.ITALIC)) {
+                    inSpans(
+                        BlockquotesSpan(gap, strikeWidth, colorSecondary),
+                        StyleSpan(Typeface.ITALIC)
+                    ) {
                         for (child in element.elements) {
                             buildElement(child, builder)
                         }
