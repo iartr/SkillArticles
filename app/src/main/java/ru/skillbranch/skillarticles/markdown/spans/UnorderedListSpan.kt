@@ -7,14 +7,15 @@ import android.text.style.LeadingMarginSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 
+// Как это выглядет: https://prnt.sc/rbd2bf
 class UnorderedListSpan(
-    @Px private val gapWidth: Float,
+    @Px private val gapWidth: Float, // Отступ от левого края
     @Px private val bulletRadius: Float,
     @ColorInt private val bulletColor: Int
 ) : LeadingMarginSpan {
 
     override fun getLeadingMargin(first: Boolean): Int {
-        return (4*bulletRadius +gapWidth).toInt()
+        return (4 * bulletRadius + gapWidth).toInt()
     }
 
     override fun drawLeadingMargin(
@@ -22,6 +23,7 @@ class UnorderedListSpan(
         lineTop: Int, lineBaseline: Int, lineBottom: Int, text: CharSequence?, lineStart: Int,
         lineEnd: Int, isFirstLine: Boolean, layout: Layout?
     ) {
+        // Рисуем круг только для первой линии
         if(isFirstLine) {
             paint.withCustomColor {
                 canvas.drawCircle(
@@ -36,10 +38,12 @@ class UnorderedListSpan(
     private inline fun Paint.withCustomColor(block: () -> Unit) {
         val oldColor = color
         val oldStyle = style
+
         color = bulletColor
         style = Paint.Style.FILL
+
         block()
-        // Восстановим старый цвет - чтобы bullet цветом не продолжил рисовать прочие элементы
+
         color = oldColor
         style = oldStyle
     }
