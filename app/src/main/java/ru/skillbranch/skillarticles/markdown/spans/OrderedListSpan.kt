@@ -18,10 +18,10 @@ class OrderedListSpan(
     @ColorInt
     private val orderColor: Int
 ) : LeadingMarginSpan {
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     override fun getLeadingMargin(first: Boolean): Int {
         return order.length.inc() * gapWidth.toInt()
-        //return gapWidth.toInt() + offset
     }
 
     private var offset: Int =0
@@ -51,7 +51,7 @@ class OrderedListSpan(
         style = Paint.Style.FILL
 
         block()
-        // Восстановим старый цвет
+
         color = oldColor
         style = oldStyle
     }

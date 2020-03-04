@@ -287,7 +287,7 @@ object MarkdownParser {
 
                 //10 -> BLOCK CODE
                 10 -> {
-                    text = string.subSequence(startIndex.plus(3), endIndex.plus(-3)).toString()
+                    text = string.subSequence(startIndex.plus(3), endIndex.minus(3)).toString()
 
                     if (text.contains(LINE_SEPARATOR)) {
                         for ((index, line) in text.lines().withIndex()) {

@@ -9,16 +9,13 @@ import ru.skillbranch.skillarticles.markdown.Element
 
 
 class BlockCodeSpan(
-    @ColorInt
-    private val textColor: Int,
-    @ColorInt
-    private val bgColor: Int,
-    @Px
-    private val cornerRadius: Float,
-    @Px
-    private val padding: Float,
+    @ColorInt private val textColor: Int,
+    @ColorInt private val bgColor: Int,
+    @Px private val cornerRadius: Float,
+    @Px private val padding: Float,
     private val type: Element.BlockCode.Type
 ) : ReplacementSpan() {
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var rect = RectF()
     @VisibleForTesting
@@ -35,10 +32,6 @@ class BlockCodeSpan(
         bottom: Int,
         paint: Paint
     ) {
-        println("BlockCodeSpan draw $type $x $y ${canvas.width} ")
-
-
-//        paint.withCustomColor(textColor) {
         when (type) {
             Element.BlockCode.Type.START -> {
                 paint.forBackground {
@@ -59,7 +52,6 @@ class BlockCodeSpan(
             }
             Element.BlockCode.Type.END -> {
                 paint.forBackground {
-
                     val corners = floatArrayOf(
                         0f, 0f,   // Top left radius in px
                         0f, 0f,   // Top right radius in px
@@ -71,7 +63,7 @@ class BlockCodeSpan(
                         0f,
                         top.toFloat(),
                         canvas.width.toFloat(),
-                        bottom - padding.toFloat()
+                        bottom - padding
                     )
                     path.reset()
                     path.addRoundRect(rect, corners, Path.Direction.CW)
@@ -119,15 +111,10 @@ class BlockCodeSpan(
         end: Int,
         fm: Paint.FontMetricsInt?
     ): Int {
-
-
         paint.forText {
             if (fm != null) {
                 when (type) {
-
-
                     Element.BlockCode.Type.START -> {
-
                         fm.ascent = (paint.ascent() - 2 * padding).toInt()
                         fm.descent = paint.descent().toInt()
                     }
@@ -143,15 +130,12 @@ class BlockCodeSpan(
                     }
 
                     Element.BlockCode.Type.SINGLE -> {
-                        val asc = paint.ascent()
                         fm.ascent = (paint.ascent() - 2 * padding).toInt()
                         fm.descent = (paint.descent() + 2 * padding).toInt()
                     }
                 }
             }
         }
-//        Log.w("BlockCodeSpan", "getSize:$type ${fm?.ascent} ${paint.ascent()}");
-//        val m = paint.measureText(text, start, end)
         return 0
     }
 
@@ -173,6 +157,7 @@ class BlockCodeSpan(
         val oldTypeface = typeface
         val oldSize = textSize
         val oldColor = color
+
         typeface = Typeface.create(Typeface.MONOSPACE, oldStyle)
         textSize *= 0.85f
         color = textColor
