@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles
+package ru.skillbranch.skillarticles.markdown
 
 val unorderedListString: String = """
 before simple text
