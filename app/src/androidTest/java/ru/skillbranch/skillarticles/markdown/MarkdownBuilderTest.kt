@@ -242,8 +242,6 @@ class MarkdownBuilderTest {
         )
 
         inOrder.verify(paint).color = defaultColor
-
-
     }
 
     @Test

@@ -8,10 +8,8 @@ import androidx.annotation.Px
 
 
 class HorizontalRuleSpan(
-    @Px
-    val ruleWidth: Float,
-    @ColorInt
-    val ruleColor: Int
+    @Px val ruleWidth: Float,
+    @ColorInt val ruleColor: Int
 ) : ReplacementSpan() {
 
     override fun getSize(
@@ -51,11 +49,13 @@ class HorizontalRuleSpan(
         val oldColor = color
         val oldStyle = style
         val oldWidth = strokeWidth
+
         color = ruleColor
         style = Paint.Style.STROKE // просто линия
         strokeWidth = ruleWidth
+
         block()
-        // Восстановим старые настройки
+
         strokeWidth = oldWidth
         color = oldColor
         style = oldStyle
