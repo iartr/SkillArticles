@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.markdown
+package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
@@ -14,7 +14,8 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.*
-import ru.skillbranch.skillarticles.markdown.spans.*
+import ru.skillbranch.skillarticles.data.repositories.Element
+import ru.skillbranch.skillarticles.ui.custom.spans.*
 
 @RunWith(AndroidJUnit4::class)
 class MarkdownBuilderTest {

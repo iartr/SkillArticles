@@ -1,7 +1,9 @@
-package ru.skillbranch.skillarticles.markdown
+package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import org.junit.Assert.*
 import org.junit.Test
+import ru.skillbranch.skillarticles.data.repositories.Element
+import ru.skillbranch.skillarticles.data.repositories.MarkdownParser
 
 class MarkdownParserTest {
     @Test

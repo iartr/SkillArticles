@@ -1,53 +1,45 @@
-package ru.skillbranch.skillarticles.markdown.spans
+package ru.skillbranch.skillarticles.ui.custom.spans
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.text.Layout
 import android.text.style.LeadingMarginSpan
-import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
-import androidx.annotation.VisibleForTesting
 
-
-class OrderedListSpan(
-    @Px
-    private val gapWidth: Float,
-    private val order: String,
-    @ColorInt
-    private val orderColor: Int
+// Как это выглядет: https://prnt.sc/rbd2bf
+class UnorderedListSpan(
+    @Px private val gapWidth: Float, // Отступ от левого края
+    @Px private val bulletRadius: Float,
+    @ColorInt private val bulletColor: Int
 ) : LeadingMarginSpan {
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     override fun getLeadingMargin(first: Boolean): Int {
-        return order.length.inc() * gapWidth.toInt()
+        return (4 * bulletRadius + gapWidth).toInt()
     }
-
-    private var offset: Int =0
 
     override fun drawLeadingMargin(
         canvas: Canvas, paint: Paint, currentMarginLocation: Int, paragraphDirection: Int,
         lineTop: Int, lineBaseline: Int, lineBottom: Int, text: CharSequence?, lineStart: Int,
         lineEnd: Int, isFirstLine: Boolean, layout: Layout?
     ) {
+        // Рисуем круг только для первой линии
         if(isFirstLine) {
             paint.withCustomColor {
-                canvas.drawText(
-                    order,
-                    gapWidth + currentMarginLocation.toFloat(),
-                    lineBaseline.toFloat(),
-                    paint
-                )
+                canvas.drawCircle(
+                    gapWidth + currentMarginLocation + bulletRadius,
+                    (lineTop + lineBottom)/2f,
+                    bulletRadius,
+                    paint)
             }
-            offset = paint.measureText("$order ").toInt()
         }
     }
 
     private inline fun Paint.withCustomColor(block: () -> Unit) {
         val oldColor = color
         val oldStyle = style
-        color = orderColor
+
+        color = bulletColor
         style = Paint.Style.FILL
 
         block()
