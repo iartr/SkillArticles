@@ -36,9 +36,9 @@ class HorizontalRuleSpan(
         paint.forLine {
             canvas.drawLine(
                 0f,
-                (top+bottom)/2f,
+                (top + bottom)/2f,
                 canvas.width.toFloat(),
-                (top+bottom)/2f,
+                (top + bottom)/2f,
                 paint
             )
         }
@@ -51,13 +51,13 @@ class HorizontalRuleSpan(
         val oldWidth = strokeWidth
 
         color = ruleColor
-        style = Paint.Style.STROKE // просто линия
+        style = Paint.Style.STROKE
         strokeWidth = ruleWidth
 
         block()
 
-        strokeWidth = oldWidth
         color = oldColor
         style = oldStyle
+        strokeWidth = oldWidth
     }
 }

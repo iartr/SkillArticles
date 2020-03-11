@@ -32,15 +32,14 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <TextView
+        <ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownContentView
             android:id="@+id/tv_text_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:padding="16dp"
             android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:saveEnabled="false"
-            android:text="Loading..." />
+            android:clipToPadding="false"
+            android:focusableInTouchMode="true"/>
 
     </androidx.core.widget.NestedScrollView>
 
