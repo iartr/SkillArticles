@@ -1,40 +1,13 @@
 package ru.skillbranch.skillarticles.extensions
 
-fun List<Pair<Int, Int>>.groupByBounds(bounds: List<Pair<Int, Int>>): List<List<Pair<Int, Int>>> {
-
-    val results= List<MutableList<Pair<Int, Int>>>(bounds.size){mutableListOf()}
-
-    var lastResult = 0
-
-    bounds@ for ((index, bound) in bounds.withIndex()) {
-        var lastIndex = bound.first
-        results@ for (result in subList(lastResult, size)) {
-            val boundRange = lastIndex..bound.second
-
-            when {
-                result.first in boundRange && result.second in boundRange -> {
-                    results[index].add(result.first to result.second)
-                    lastResult++
-                    lastIndex = result.second
-                }
-
-                result.first in boundRange && result.second !in boundRange -> {
-                    if(result.first != bound.second){
-                        results[index].add(result.first to bound.second)
-                    }
-                    continue@bounds
-                }
-
-                result.first !in boundRange && result.second in boundRange -> {
-                    if(bound.first != result.second){
-                        results[index].add(bound.first to result.second)
-                    }
-                    lastResult++
-                    continue@results
+fun List<Pair<Int, Int>>.groupByBounds(bounds: List<Pair<Int, Int>>): List<List<Pair<Int, Int>>> =
+    bounds.map { boundary ->
+        this.filter { it.second > boundary.first && it.first < boundary.second }
+            .map {
+                when {
+                    it.first < boundary.first -> Pair(boundary.first, it.second)
+                    it.second > boundary.second -> Pair(it.first, boundary.second)
+                    else -> it
                 }
             }
-        }
     }
-
-    return results
-}
