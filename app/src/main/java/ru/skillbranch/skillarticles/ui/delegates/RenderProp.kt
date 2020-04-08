@@ -19,7 +19,7 @@ class RenderProp<T: Any>(
         thisRef: Binding,
         property: KProperty<*>
     ): ReadWriteProperty<Binding, T> {
-        val delegate = RenderProp(value, true, onChange)
+        val delegate = RenderProp(value, needInit, onChange)
         registerDelegate(thisRef, property.name, delegate)
         return delegate
     }
