@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.ui
+package ru.skillbranch.skillarticles.ui.article
 
 interface IArticleView {
     // Показать search bar

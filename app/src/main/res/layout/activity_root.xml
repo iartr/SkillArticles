@@ -2,7 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinator_container"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.RootActivity">
@@ -20,48 +20,27 @@
             android:elevation="4dp"
             android:theme="@style/ArticleBarsTheme"
             app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
-            app:logo="@drawable/logo_placeholder"
-            app:subtitle="loading..."
             app:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll"
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        app:defaultNavHost="true"
+        app:layout_behavior=".ui.custom.behaviors.ContentBehaviour"
+        app:navGraph="@navigation/mobile_navigation" />
 
-        <ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownContentView
-            android:id="@+id/tv_text_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:focusable="true"
-            android:clipToPadding="false"
-            android:focusableInTouchMode="true"/>
-
-    </androidx.core.widget.NestedScrollView>
-
-    <ru.skillbranch.skillarticles.ui.custom.ArticleSubmenu
-        android:id="@+id/submenu"
-        android:layout_width="200dp"
-        android:layout_height="96dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:theme="@style/ArticleBarsTheme"
-        android:visibility="gone"
-        app:layout_dodgeInsetEdges="bottom"
-        tools:visibility="visible" />
-
-    <ru.skillbranch.skillarticles.ui.custom.Bottombar
-        android:id="@+id/bottombar"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/nav_view"
+        style="@style/NavBarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
-        android:elevation="4dp"
-        android:theme="@style/ArticleBarsTheme"
-        app:layout_insetEdge="bottom" />
+        android:theme="@style/NavBarTheme"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

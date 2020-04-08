@@ -1,8 +1,7 @@
-package ru.skillbranch.skillarticles.viewmodels
+package ru.skillbranch.skillarticles.viewmodels.article
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
@@ -11,13 +10,16 @@ import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
-import ru.skillbranch.skillarticles.data.repositories.MarkdownParser
 import ru.skillbranch.skillarticles.data.repositories.clearContent
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
-class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
+class ArticleViewModel(
+    handle: SavedStateHandle,
+    private val articleId: String
+) : BaseViewModel<ArticleState>(handle, ArticleState()), IArticleViewModel {
     private val repository = ArticleRepository
     private var clearContent: String? = null
 
@@ -56,9 +58,12 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
                 isBigText = settings.isBigText
             )
         }
+
+        subscribeOnDataSource(repository.isAuth()) { isAuth, state ->
+            state.copy(isAuth = isAuth)
+        }
     }
 
-    /* 3 метода, которые используются для подписки на данные */
     // load text from network
     override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
         return repository.loadArticleContent(articleId)
@@ -73,7 +78,6 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     override fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?> {
         return repository.loadArticlePersonalInfo(articleId)
     }
-    /* 3 метода, которые используются для подписки на данные */
 
     override fun handleUpText() {
         repository.updateSettings(currentState.toAppSettings().copy(isBigText = true))
@@ -146,6 +150,11 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     fun handleCopyCode() {
         notify(Notify.TextMessage("Code copy to clipboard"))
     }
+
+    fun handleSendComment() {
+        if (!currentState.isAuth) navigate(NavigationCommand.StartLogin())
+        // TODO — Send comment
+    }
 }
 
 data class ArticleState(
@@ -171,21 +180,19 @@ data class ArticleState(
     val content: List<MarkdownElement> = emptyList(),
     val reviews: List<Any> = emptyList()
 ): IViewModelState {
-    override fun save(outState: Bundle) {
-        outState.putAll(bundleOf(
-            "isSearch" to isSearch,
-            "searchQuery" to searchQuery,
-            "searchResults" to searchResults,
-            "searchPosition" to searchPosition
-        ))
+    override fun save(outState: SavedStateHandle) {
+        outState.set("isSearch", isSearch)
+        outState.set("searchQuery", searchQuery)
+        outState.set("searchResults", searchResults)
+        outState.set("searchPosition", searchPosition)
     }
 
-    override fun restore(savedState: Bundle): IViewModelState {
+    override fun restore(savedState: SavedStateHandle): IViewModelState {
         return copy(
-            isSearch = savedState["isSearch"] as Boolean,
-            searchQuery = savedState["searchQuery"] as? String,
-            searchResults = savedState["searchResults"] as List<Pair<Int, Int>>,
-            searchPosition = savedState["searchPosition"] as Int
+            isSearch = savedState["isSearch"] ?: false,
+            searchQuery = savedState["searchQuery"],
+            searchResults = savedState["searchResults"] ?: emptyList(),
+            searchPosition = savedState["searchPosition"] ?: 0
         )
     }
 }

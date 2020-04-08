@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.data.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import ru.skillbranch.skillarticles.data.*
 
@@ -9,12 +10,11 @@ object ArticleRepository {
     private val network = NetworkDataHolder
 
     fun loadArticleContent(articleId: String): LiveData<List<MarkdownElement>?> {
-        return Transformations.map(network.loadArticleContent(articleId)) {
-            return@map if (it == null) null
+        return Transformations.map(network.loadArticleContent(articleId)){
+            return@map  if(it == null) null
             else MarkdownParser.parse(it)
         }
     }
-
     fun getArticle(articleId: String): LiveData<ArticleData?> {
         return local.findArticle(articleId) //2s delay from db
     }
@@ -31,4 +31,6 @@ object ArticleRepository {
     fun updateArticlePersonalInfo(info: ArticlePersonalInfo) {
         local.updateArticlePersonalInfo(info)
     }
+
+    fun isAuth(): MutableLiveData<Boolean> = local.isAuth()
 }

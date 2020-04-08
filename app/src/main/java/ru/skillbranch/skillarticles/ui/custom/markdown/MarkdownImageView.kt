@@ -79,6 +79,7 @@ class MarkdownImageView private constructor(
     }
 
     private var isOpen = false
+    private var aspectRatio = 0f
 
     init {
         layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
@@ -244,6 +245,7 @@ class MarkdownImageView private constructor(
     override fun onSaveInstanceState(): Parcelable? {
         val savedState = SavedState(super.onSaveInstanceState())
         savedState.ssIsOpen = isOpen
+        savedState.ssAspectRatio = (iv_image.width.toFloat() / iv_image.height)
         return savedState
     }
 
@@ -251,12 +253,14 @@ class MarkdownImageView private constructor(
         super.onRestoreInstanceState(state)
         if (state is SavedState) {
             isOpen = state.ssIsOpen
+            aspectRatio = state.ssAspectRatio
             tv_alt?.isVisible = isOpen
         }
     }
 
     private class SavedState : BaseSavedState, Parcelable {
         var ssIsOpen: Boolean = false
+        var ssAspectRatio: Float = 0f
 
         constructor(superState: Parcelable?) : super(superState)
 

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<ru.skillbranch.skillarticles.ui.custom.Bottombar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    android:id="@+id/bottombar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:layout_gravity="bottom"
+    android:elevation="4dp"
+    android:theme="@style/ArticleBarsTheme"
+    app:layout_insetEdge="bottom">
 
     <ru.skillbranch.skillarticles.ui.custom.CheckableImageView
         android:id="@+id/btn_like"
@@ -68,34 +74,34 @@
             android:id="@+id/btn_search_close"
             style="@style/BottombarSearchIcon"
             android:src="@drawable/ic_close_black_24dp"
-            tools:tint="@android:color/white"/>
+            tools:tint="@android:color/white" />
 
         <TextView
             android:id="@+id/tv_search_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:text="Not found"
-            android:layout_gravity="center_vertical"
             android:textColor="?attr/colorPrimary"
-            tools:textColor="@android:color/white"/>
+            tools:textColor="@android:color/white" />
 
         <View
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/btn_result_down"
             style="@style/BottombarSearchIcon"
             android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
-            tools:tint="@android:color/white"/>
+            tools:tint="@android:color/white" />
 
         <ImageView
             android:id="@+id/btn_result_up"
             style="@style/BottombarSearchIcon"
             android:src="@drawable/ic_keyboard_arrow_up_black_24dp"
-            tools:tint="@android:color/white"/>
+            tools:tint="@android:color/white" />
 
     </LinearLayout>
-</merge>
+</ru.skillbranch.skillarticles.ui.custom.Bottombar>

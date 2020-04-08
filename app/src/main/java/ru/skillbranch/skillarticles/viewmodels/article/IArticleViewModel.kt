@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.viewmodels
+package ru.skillbranch.skillarticles.viewmodels.article
 
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
