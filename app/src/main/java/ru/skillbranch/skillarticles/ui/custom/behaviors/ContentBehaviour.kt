@@ -21,7 +21,6 @@ class ContentBehaviour() : AppBarLayout.ScrollingViewBehavior() {
         parentHeightMeasureSpec: Int,
         heightUsed: Int
     ): Boolean {
-
         if (child is FragmentContainerView && !child.children.first().isNestedScrollingEnabled) {
             val appbar = parent.children.find { it is AppBarLayout }
             val appbarHeight = appbar?.measuredHeight ?: 0

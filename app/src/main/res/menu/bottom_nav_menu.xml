@@ -13,7 +13,7 @@
     <item
         android:id="@+id/nav_transcriptions"
         android:icon="@drawable/ic_translate_black_24dp"
-        android:title="@string/title_transcription"/>
+        android:title="@string/title_transcriptions"/>
 
     <item
         android:id="@+id/nav_profile"

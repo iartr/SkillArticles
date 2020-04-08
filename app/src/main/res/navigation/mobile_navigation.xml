@@ -8,11 +8,11 @@
     <fragment
         android:id="@+id/page_article"
         android:name="ru.skillbranch.skillarticles.ui.article.ArticleFragment"
-        android:label="ArticleFragment"
-        tools:layout="@layout/fragment_article">
+        android:label="ArticleFragment" >
         <argument
             android:name="article_id"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="-1" />
         <argument
             android:name="author"
             app:argType="string" />
@@ -26,14 +26,14 @@
             android:name="category_icon"
             app:argType="string" />
         <argument
-            android:name="date"
-            app:argType="java.util.Date" />
-        <argument
             android:name="poster"
             app:argType="string" />
         <argument
             android:name="title"
             app:argType="string" />
+        <argument
+            android:name="date"
+            app:argType="java.util.Date" />
     </fragment>
     <fragment
         android:id="@+id/nav_articles"
@@ -45,6 +45,11 @@
             app:destination="@id/page_article" />
     </fragment>
     <fragment
+        android:id="@+id/nav_profile"
+        android:name="ru.skillbranch.skillarticles.ui.profile.ProfileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
         android:id="@+id/nav_bookmarks"
         android:name="ru.skillbranch.skillarticles.ui.bookmarks.BookmarksFragment"
         android:label="@string/title_bookmarks"
@@ -52,29 +57,18 @@
     <fragment
         android:id="@+id/nav_transcriptions"
         android:name="ru.skillbranch.skillarticles.ui.transcriptions.TranscriptionsFragment"
-        android:label="@string/title_transcription"
+        android:label="@string/title_transcriptions"
         tools:layout="@layout/fragment_transcriptions" />
-    <fragment
-        android:id="@+id/nav_profile"
-        android:name="ru.skillbranch.skillarticles.ui.profile.ProfileFragment"
-        android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" >
-        <action
-            android:id="@+id/action_nav_profile_to_navigation"
-            app:destination="@id/navigation" />
-    </fragment>
-
     <navigation
-        android:id="@+id/navigation"
-        app:startDestination="@id/nav_auth" >
+        android:id="@+id/auth"
+        app:startDestination="@id/nav_auth"
+        android:label="@string/title_authorization">
         <fragment
             android:id="@+id/nav_auth"
             android:name="ru.skillbranch.skillarticles.ui.auth.AuthFragment"
-            android:label="fragment_auth"
+            android:label="@string/title_authorization"
             tools:layout="@layout/fragment_auth" >
-            <action
-                android:id="@+id/action_authFragment_to_privacyPolicyFragment2"
-                app:destination="@id/page_privacy_policy" />
+
             <argument
                 android:name="private_destination"
                 app:argType="integer"
@@ -83,18 +77,18 @@
         <fragment
             android:id="@+id/page_privacy_policy"
             android:name="ru.skillbranch.skillarticles.ui.auth.PrivacyPolicyFragment"
-            android:label="fragment_privacy_policy"
+            android:label="@string/title_privacy_policy"
             tools:layout="@layout/fragment_privacy_policy" />
+
     </navigation>
 
-    <!-- global actions -->
+    <!--global actions -->
     <action
         android:id="@+id/start_login"
-        app:destination="@id/nav_auth"/>
+        app:destination="@id/auth"/>
     <action
         android:id="@+id/finish_login"
-        app:popUpTo="@id/nav_auth"
+        app:popUpTo="@id/auth"
         app:popUpToInclusive="true"/>
-
 
 </navigation>
