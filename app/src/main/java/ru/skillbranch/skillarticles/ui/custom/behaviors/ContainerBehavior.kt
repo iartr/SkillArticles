@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentContainerView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class ContentBehaviour() : AppBarLayout.ScrollingViewBehavior() {
+class ContainerBehavior() : AppBarLayout.ScrollingViewBehavior() {
     constructor(context: Context, attributeSet: AttributeSet): this()
 
     override fun onMeasureChild(
