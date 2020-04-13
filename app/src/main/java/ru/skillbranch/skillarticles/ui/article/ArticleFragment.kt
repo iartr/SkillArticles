@@ -294,6 +294,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
             isLoadingContent = data.isLoadingContent
             isSearch = data.isSearch
+            isSearching = data.isSearch
             searchQuery = data.searchQuery
             searchPosition = data.searchPosition
             searchResults = data.searchResults

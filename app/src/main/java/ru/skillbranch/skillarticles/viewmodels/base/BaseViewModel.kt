@@ -7,10 +7,7 @@ import androidx.lifecycle.*
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 
-abstract class BaseViewModel<T : IViewModelState>(
-    private val handleState: SavedStateHandle,
-    initState: T
-) : ViewModel() {
+abstract class BaseViewModel<T : IViewModelState>(private val handleState: SavedStateHandle, initState: T) : ViewModel() {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val notifications = MutableLiveData<Event<Notify>>()
 
@@ -55,6 +52,10 @@ abstract class BaseViewModel<T : IViewModelState>(
         notifications.value = Event(content)
     }
 
+    open fun navigate(navigationCommand: NavigationCommand) {
+        navigation.value = Event(navigationCommand)
+    }
+
     /***
      * более компактная форма записи observe() метода LiveData принимает последним аргумент лямбда
      * выражение обрабатывающее изменение текущего стостояния
@@ -74,10 +75,6 @@ abstract class BaseViewModel<T : IViewModelState>(
 
     fun observeNavigation(owner: LifecycleOwner, onNavigate: (navigationCommand: NavigationCommand) -> Unit) {
         navigation.observe(owner, EventObserver { onNavigate(it) })
-    }
-
-    open fun navigate(navigationCommand: NavigationCommand) {
-        navigation.value = Event(navigationCommand)
     }
 
     /***
