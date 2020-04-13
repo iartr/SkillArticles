@@ -68,6 +68,7 @@ object LocalDataHolder {
                     title = "Using Safe args plugin — current state of affairs",
                     description = "Article describing usage of Safe args Gradle plugin with the Navigation Architecture Component and current support for argument types",
                     author = "Veronika Petruskova",
+                    date = Date(1586602982217),
                     authorAvatar = "https://miro.medium.com/fit/c/96/96/1*VSq5CqY3y1Bb4CLK83ZIuw.png",
                     poster = "https://miro.medium.com/max/1920/1*u4uWVOpqFCR1gGpJTewhhA.jpeg"
                 ),
