@@ -16,17 +16,10 @@ class IconLinkSpan(
     @ColorInt private val textColor: Int,
     dotWidth: Float = 6f
 ) : ReplacementSpan() {
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var iconSize = 0
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var textWidth = 0f
-
+    private var iconSize = 0
+    private var textWidth = 0f
     private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var path = Path()
+    private var path = Path()
 
     override fun draw(
         canvas: Canvas,
@@ -66,7 +59,7 @@ class IconLinkSpan(
         fm: Paint.FontMetricsInt?
     ): Int {
         if (fm != null) {
-            iconSize = fm.descent - fm.ascent // размер фонта
+            iconSize = fm.descent - fm.ascent
             linkDrawable.setBounds(0, 0, iconSize, iconSize)
         }
         textWidth = paint.measureText(text.toString(), start, end)
@@ -78,9 +71,9 @@ class IconLinkSpan(
         val oldStyle = style
         val oldWidth = strokeWidth
 
-        pathEffect = dashs // прерывистая линия
+        pathEffect = dashs
         color = textColor
-        style = Paint.Style.STROKE // просто линия
+        style = Paint.Style.STROKE
         strokeWidth = 0f
 
         block()

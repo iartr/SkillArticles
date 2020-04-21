@@ -7,9 +7,9 @@ import android.text.style.LeadingMarginSpan
 import androidx.annotation.ColorInt
 import androidx.annotation.Px
 
-// Как это выглядет: https://prnt.sc/rbd2bf
+// https://prnt.sc/rbd2bf
 class UnorderedListSpan(
-    @Px private val gapWidth: Float, // Отступ от левого края
+    @Px private val gapWidth: Float,
     @Px private val bulletRadius: Float,
     @ColorInt private val bulletColor: Int
 ) : LeadingMarginSpan {
@@ -23,7 +23,6 @@ class UnorderedListSpan(
         lineTop: Int, lineBaseline: Int, lineBottom: Int, text: CharSequence?, lineStart: Int,
         lineEnd: Int, isFirstLine: Boolean, layout: Layout?
     ) {
-        // Рисуем круг только для первой линии
         if(isFirstLine) {
             paint.withCustomColor {
                 canvas.drawCircle(

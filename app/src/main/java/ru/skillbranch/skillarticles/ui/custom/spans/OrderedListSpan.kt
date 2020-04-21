@@ -8,21 +8,17 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
 
-
 class OrderedListSpan(
-    @Px
-    private val gapWidth: Float,
+    @Px private val gapWidth: Float,
     private val order: String,
-    @ColorInt
-    private val orderColor: Int
+    @ColorInt private val orderColor: Int
 ) : LeadingMarginSpan {
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     override fun getLeadingMargin(first: Boolean): Int {
         return order.length.inc() * gapWidth.toInt()
     }
 
-    private var offset: Int =0
+    private var offset: Int = 0
 
     override fun drawLeadingMargin(
         canvas: Canvas, paint: Paint, currentMarginLocation: Int, paragraphDirection: Int,

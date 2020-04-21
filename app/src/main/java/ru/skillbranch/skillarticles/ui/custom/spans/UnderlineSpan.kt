@@ -13,8 +13,7 @@ class UnderlineSpan(
 ) : ReplacementSpan() {
     private var textWidth = 0
     private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var path = Path()
+    private var path = Path()
 
     override fun draw(
         canvas: Canvas,
@@ -37,7 +36,6 @@ class UnderlineSpan(
         canvas.drawText(text, start, end, x, y.toFloat(), paint)
     }
 
-
     override fun getSize(
         paint: Paint,
         text: CharSequence?,
@@ -48,7 +46,6 @@ class UnderlineSpan(
         textWidth = paint.measureText(text.toString(), start, end).toInt()
         return textWidth
     }
-
 
     private inline fun Paint.forLine(block: () -> Unit) {
         val oldColor = color

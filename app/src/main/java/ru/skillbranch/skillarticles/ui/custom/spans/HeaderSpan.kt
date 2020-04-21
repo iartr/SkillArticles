@@ -15,23 +15,16 @@ import androidx.annotation.Px
 import androidx.annotation.VisibleForTesting
 
 class HeaderSpan constructor(
-    @IntRange(from = 1, to = 6)
-    private val level: Int,
-    @ColorInt
-    private val textColor: Int,
-    @ColorInt
-    private val dividerColor: Int,
-    @Px
-    private val marginTop: Float,
-    @Px
-    private val marginBottom: Float
+    @IntRange(from = 1, to = 6) private val level: Int,
+    @ColorInt private val textColor: Int,
+    @ColorInt private val dividerColor: Int,
+    @Px private val marginTop: Float,
+    @Px private val marginBottom: Float
 ) : MetricAffectingSpan(), LineHeightSpan, LeadingMarginSpan {
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val linePadding = 0.4f
+    private val linePadding = 0.4f
     private var originAscent = 0
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val sizes = mapOf(
+    private val sizes = mapOf(
         1 to 2f,
         2 to 1.5f,
         3 to 1.25f,
@@ -118,8 +111,6 @@ class HeaderSpan constructor(
                 )
             }
         }
-
-//        canvas.drawFontLines(lineTop, lineBottom, lineBaseline, paint)
     }
 
     override fun getLeadingMargin(first: Boolean): Int {
@@ -140,17 +131,6 @@ class HeaderSpan constructor(
         color = oldColor
         style = oldStyle
         strokeWidth = oldWidth
-    }
-
-    private fun Canvas.drawFontLines(
-        top: Int,
-        bottom: Int,
-        lineBaseline: Int,
-        paint: Paint
-    ) {
-        drawLine(0f, top + 0f, width + 0f, top + 0f, Paint().apply { color = Color.BLUE })
-        drawLine(0f, bottom + 0f, width + 0f, bottom + 0f, Paint().apply { color = Color.GREEN })
-        drawLine(0f,lineBaseline + 0f,width + 0f,lineBaseline + 0f,Paint().apply { color = Color.RED })
     }
 
 }
