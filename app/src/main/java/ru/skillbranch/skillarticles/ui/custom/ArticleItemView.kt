@@ -194,7 +194,7 @@ class ArticleItemView constructor(context: Context) : ViewGroup(context), Layout
 
         // description
         tv_description.layout(paddingLeft, currentHeight, paddingLeft + bodyWidth, currentHeight + tv_description.measuredHeight)
-        currentHeight += tv_description.measuredHeight + paddingLeft
+        currentHeight += tv_description.measuredHeight + defaultMargin
 
         // icons block
         val fontDiff = iconSize - tv_likes_count.measuredHeight
