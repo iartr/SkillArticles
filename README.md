@@ -1,1 +1,1 @@
-![demo](https://i.ibb.co/x2j4Jww/demo.gif)
+![demo](demo.gif)
