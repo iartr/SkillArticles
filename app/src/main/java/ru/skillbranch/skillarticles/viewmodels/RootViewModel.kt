@@ -31,6 +31,4 @@ class RootViewModel(handle: SavedStateHandle) : BaseViewModel<RootState>(handle,
     }
 }
 
-data class RootState(
-    val isAuth: Boolean = false
-) : IViewModelState
+data class RootState(val isAuth: Boolean = false) : IViewModelState

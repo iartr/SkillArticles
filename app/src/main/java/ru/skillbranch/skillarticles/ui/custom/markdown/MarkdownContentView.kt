@@ -145,9 +145,7 @@ class MarkdownContentView @JvmOverloads constructor(
         }
     }
 
-    fun renderSearchPosition(
-        searchPosition: Pair<Int, Int>?
-    ) {
+    fun renderSearchPosition(searchPosition: Pair<Int, Int>?) {
         searchPosition ?: return
         val bounds = elements.map { it.bounds }
 
