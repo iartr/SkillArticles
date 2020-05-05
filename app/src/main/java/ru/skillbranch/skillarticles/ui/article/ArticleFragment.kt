@@ -69,10 +69,10 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     }
 
     private val bottombar
-        get() = root.bottombar
+        get() = root.findViewById<Bottombar>(R.id.bottombar)
 
     private val submenu
-        get() = root.submenu
+        get() = root.findViewById<ArticleSubmenu>(R.id.submenu)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
