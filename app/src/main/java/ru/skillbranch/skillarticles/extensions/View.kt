@@ -2,7 +2,8 @@ package ru.skillbranch.skillarticles.extensions
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.children
+import androidx.annotation.IdRes
+import androidx.core.view.iterator
 import androidx.navigation.NavDestination
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -26,7 +27,27 @@ fun View.setPaddingOptionally(
 }
 
 fun BottomNavigationView.selectDestination(destination: NavDestination) {
-    menu.findItem(destination.id)?.let {
-        it.isChecked = true
-    } ?: run { menu.children.last().isChecked = true }
+    for (item in menu.iterator()) {
+        if (matchDestination(destination, item.itemId)) {
+            item.isChecked = true
+        }
+    }
+}
+
+fun BottomNavigationView.selectItem(itemId: Int?){
+    itemId?: return
+    for (item in menu.iterator()) {
+        if(item.itemId == itemId) {
+            item.isChecked = true
+            break
+        }
+    }
+}
+
+private fun matchDestination(destination: NavDestination, @IdRes destId: Int) : Boolean{
+    var currentDestination: NavDestination? = destination
+    while (currentDestination!!.id != destId && currentDestination.parent != null) {
+        currentDestination = currentDestination.parent
+    }
+    return currentDestination.id == destId
 }
