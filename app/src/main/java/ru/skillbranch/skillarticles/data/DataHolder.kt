@@ -15,7 +15,7 @@ object LocalDataHolder {
     private val articleInfo = MutableLiveData<ArticlePersonalInfo?>(null)
     private val settings = MutableLiveData(AppSettings())
     private val isAuth = MutableLiveData(false)
-    val localArticleItems: MutableList<ArticleItemData> = generateArticleItems(200) as MutableList<ArticleItemData>
+    val localArticleItems: MutableList<ArticleItemData> = mutableListOf()
     val localArticles: MutableMap<String, MutableLiveData<ArticleData>> = mutableMapOf()
 
     fun findArticle(articleId: String): LiveData<ArticleData?> {

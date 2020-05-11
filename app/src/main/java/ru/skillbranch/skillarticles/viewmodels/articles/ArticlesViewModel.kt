@@ -1,13 +1,18 @@
 package ru.skillbranch.skillarticles.viewmodels.articles
 
 import androidx.lifecycle.*
-import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
+import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
+import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
 import java.util.concurrent.Executors
 
 class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>(handle, ArticlesState()) {
@@ -29,12 +34,6 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
         listData.observe(owner, Observer { onChange(it) })
     }
 
-    private fun buildPagedList(dataFactory: DataSource.Factory<Int, ArticleItemData>): LiveData<PagedList<ArticleItemData>> {
-        return LivePagedListBuilder<Int, ArticleItemData>(dataFactory, listConfig)
-            .setFetchExecutor(Executors.newSingleThreadExecutor())
-            .build()
-    }
-
     fun handleSearch(query: String?) {
         query ?: return
         updateState {
@@ -47,6 +46,42 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
             it.copy(isSearch = isSearch)
         }
     }
+
+    private fun buildPagedList(dataFactory: ArticlesDataFactory): LiveData<PagedList<ArticleItemData>> {
+        val builder = LivePagedListBuilder<Int, ArticleItemData>(dataFactory, listConfig)
+
+        if (dataFactory.strategy is ArticleStrategy.AllArticles) {
+            builder.setBoundaryCallback(ArticlesBoundaryCallback(::zeroLoadingHandle, ::itemAtEndHandle))
+        }
+
+        return builder.setFetchExecutor(Executors.newSingleThreadExecutor()).build()
+    }
+
+    private fun zeroLoadingHandle() {
+        notify(Notify.TextMessage("Storage is empty"))
+        viewModelScope.launch(Dispatchers.IO) {
+            val items = repository.loadArticlesFromNetwork(0, listConfig.initialLoadSizeHint)
+            if (items.isNotEmpty()) {
+                repository.insertArticlesToDb(items)
+                listData.value?.dataSource?.invalidate()
+            }
+        }
+    }
+
+    private fun itemAtEndHandle(itemAtEnd: ArticleItemData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val items = repository.loadArticlesFromNetwork(itemAtEnd.id.toInt() + 1, listConfig.pageSize)
+
+            if (items.isNotEmpty()) {
+                repository.insertArticlesToDb(items)
+                listData.value?.dataSource?.invalidate()
+            }
+
+            withContext(Dispatchers.Main) {
+                notify(Notify.TextMessage("Loaded from network from ${items.firstOrNull()?.id} to ${items.lastOrNull()?.id}"))
+            }
+        }
+    }
 }
 
 data class ArticlesState(
@@ -54,3 +89,17 @@ data class ArticlesState(
     val searchQuery: String? = null,
     val isLoading: Boolean = true
 ): IViewModelState
+
+class ArticlesBoundaryCallback(
+    private val zeroLoadingHandle: () -> Unit,
+    private val itemAtEndHandle: (itemAtEnd: ArticleItemData) -> Unit
+) : PagedList.BoundaryCallback<ArticleItemData>() {
+
+    override fun onZeroItemsLoaded() {
+        zeroLoadingHandle()
+    }
+
+    override fun onItemAtEndLoaded(itemAtEnd: ArticleItemData) {
+        itemAtEndHandle(itemAtEnd)
+    }
+}
