@@ -13,9 +13,22 @@ object ArticlesRepository {
         return ArticlesDataFactory(ArticleStrategy.AllArticles(::findArticlesByRange))
     }
 
+    fun searchArticles(searchQuery: String): DataSource.Factory<Int, ArticleItemData> {
+        return ArticlesDataFactory(ArticleStrategy.SearchArticle(::searchArticlesByTitle, searchQuery))
+    }
+
     private fun findArticlesByRange(start: Int, size: Int) = local.localArticleItems
         .drop(start)
         .take(size)
+
+    private fun searchArticlesByTitle(start: Int, size: Int, queryTitle: String): List<ArticleItemData> {
+        return local.localArticleItems
+            .asSequence()
+            .filter { it.title.contains(queryTitle, ignoreCase = true) }
+            .drop(start)
+            .take(size)
+            .toList()
+    }
 }
 
 class ArticlesDataFactory(private val strategy: ArticleStrategy) : DataSource.Factory<Int, ArticleItemData>() {
@@ -24,7 +37,7 @@ class ArticlesDataFactory(private val strategy: ArticleStrategy) : DataSource.Fa
     }
 }
 
-class ArticleDataSource(val strategy: ArticleStrategy) : PositionalDataSource<ArticleItemData>() {
+class ArticleDataSource(private val strategy: ArticleStrategy) : PositionalDataSource<ArticleItemData>() {
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<ArticleItemData>) {
         val result = strategy.getItems(params.requestedStartPosition, params.requestedLoadSize)
         Log.e("ArticlesRepository", "loadInitial: start = ${params.requestedStartPosition} size = ${params.requestedLoadSize} resultSize = ${result.size}")
