@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -74,6 +76,12 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     private val submenu
         get() = root.findViewById<ArticleSubmenu>(R.id.submenu)
 
+    private val commentsAdapter by lazy {
+        CommentsAdapter {
+            Log.e("ArticleFragment", "onClickComment: ${it.id}, ${it.slug}, ${it.answerTo}")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -107,6 +115,15 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             root.hideKeyboard()
             viewModel.handleSendComment()
             true
+        }
+
+        with(rv_comments) {
+            layoutManager = LinearLayoutManager(context)
+            adapter = commentsAdapter
+        }
+
+        viewModel.observeList(viewLifecycleOwner) {
+            commentsAdapter.submitList(it)
         }
     }
 

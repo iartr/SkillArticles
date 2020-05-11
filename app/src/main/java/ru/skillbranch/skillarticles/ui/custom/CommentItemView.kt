@@ -59,7 +59,7 @@ class CommentItemView(context: Context) : ViewGroup(context, null, 0) {
         addView(tv_author)
 
         tv_body = TextView(context).apply {
-//            id=R.id.tv_comment_body
+            id = R.id.tv_comment_body
             setTextColor(grayColor)
             textSize = 14f
         }
@@ -178,6 +178,7 @@ class CommentItemView(context: Context) : ViewGroup(context, null, 0) {
     fun bind(item: CommentItemData?) {
         if (item == null) {
             //TODO show shimmer
+            tv_author.text = "Loading - need placeholder this"
         } else {
             val level = min(item.slug.split("/").size.dec(), 5)
             setPaddingOptionally(left = level * defaultHSpace)

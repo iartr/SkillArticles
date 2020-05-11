@@ -3,10 +3,15 @@ package ru.skillbranch.skillarticles.data.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.paging.DataSource
+import androidx.paging.ItemKeyedDataSource
 import ru.skillbranch.skillarticles.data.*
 import ru.skillbranch.skillarticles.data.models.AppSettings
 import ru.skillbranch.skillarticles.data.models.ArticleData
 import ru.skillbranch.skillarticles.data.models.ArticlePersonalInfo
+import ru.skillbranch.skillarticles.data.models.CommentItemData
+import java.lang.Thread.sleep
+import kotlin.math.abs
 
 object ArticleRepository {
     private val local = LocalDataHolder
@@ -36,4 +41,56 @@ object ArticleRepository {
     }
 
     fun isAuth(): MutableLiveData<Boolean> = local.isAuth()
+    fun allComments(articleId: String, totalCount: Int): CommentsDataFactory {
+        return CommentsDataFactory(::loadCommentsByRange, articleId, totalCount)
+    }
+
+    private fun loadCommentsByRange(slug: String?, size: Int, articleId: String): List<CommentItemData> {
+        val data = network.commentsData.getOrElse(articleId) { mutableListOf() }
+        return when {
+            slug == null -> data.take(size)
+            size > 0 -> data.dropWhile { it.slug != slug }.drop(1).take(size)
+            size < 0 -> data.dropLastWhile { it.slug != slug }.dropLast(1).takeLast(abs(size))
+            else -> emptyList()
+        }
+    }
+}
+
+class CommentsDataFactory(
+    private val itemProvider: (String?, Int, String) -> List<CommentItemData>,
+    private val articleId: String,
+    private val totalCount: Int
+) : DataSource.Factory<String?, CommentItemData>() {
+    override fun create(): DataSource<String?, CommentItemData> {
+        return CommentsDataSource(itemProvider, articleId, totalCount)
+    }
+}
+
+class CommentsDataSource(
+    private val itemProvider: (String?, Int, String) -> List<CommentItemData>,
+    private val articleId: String,
+    private val totalCount: Int
+): ItemKeyedDataSource<String, CommentItemData>() {
+    override fun loadInitial(
+        params: LoadInitialParams<String>,
+        callback: LoadInitialCallback<CommentItemData>
+    ) {
+        val result = itemProvider(params.requestedInitialKey, params.requestedLoadSize, articleId)
+
+        callback.onResult(if (totalCount > 0) result else emptyList(), 0, totalCount)
+    }
+
+    override fun loadAfter(params: LoadParams<String>, callback: LoadCallback<CommentItemData>) {
+        val result = itemProvider(params.key, params.requestedLoadSize, articleId)
+        callback.onResult(result)
+    }
+
+    override fun loadBefore(params: LoadParams<String>, callback: LoadCallback<CommentItemData>) {
+        val result = itemProvider(params.key, -params.requestedLoadSize, articleId)
+        callback.onResult(result)
+    }
+
+    override fun getKey(item: CommentItemData): String {
+        return item.slug
+    }
 }
