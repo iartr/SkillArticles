@@ -5,6 +5,8 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.TypedValue
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 
 fun Context.dpToPx(dp: Int): Float {
@@ -32,6 +34,11 @@ fun Context.attrValue(@AttrRes id: Int): Int {
     } else {
         error("can not attribute for : $id")
     }
+}
+
+fun Context.showKeyboard(view: View) {
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
 }
 
 val Context.isNetworkAvailable: Boolean

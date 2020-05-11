@@ -6,10 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.ItemKeyedDataSource
 import ru.skillbranch.skillarticles.data.*
-import ru.skillbranch.skillarticles.data.models.AppSettings
-import ru.skillbranch.skillarticles.data.models.ArticleData
-import ru.skillbranch.skillarticles.data.models.ArticlePersonalInfo
-import ru.skillbranch.skillarticles.data.models.CommentItemData
+import ru.skillbranch.skillarticles.data.models.*
 import java.lang.Thread.sleep
 import kotlin.math.abs
 
@@ -53,6 +50,11 @@ object ArticleRepository {
             size < 0 -> data.dropLastWhile { it.slug != slug }.dropLast(1).takeLast(abs(size))
             else -> emptyList()
         }
+    }
+
+    fun sendComment(articleId: String, comment: String, answerToSlug: String?) {
+        network.sendMessage(articleId, comment, answerToSlug, User("777", "John Doe", "https://miro.medium.com/fit/c/96/96/0*zhOjC9mtKiAzmBQo.png"))
+        local.incrementCommentsCount(articleId)
     }
 }
 
