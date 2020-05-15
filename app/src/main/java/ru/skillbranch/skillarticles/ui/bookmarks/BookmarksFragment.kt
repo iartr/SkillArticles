@@ -1,6 +1,9 @@
 package ru.skillbranch.skillarticles.ui.bookmarks
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,16 +24,17 @@ import ru.skillbranch.skillarticles.viewmodels.bookmarks.BookmarksViewModel
 class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
     override val viewModel: BookmarksViewModel by viewModels()
     override val layout: Int = R.layout.fragment_bookmarks
+    override val binding: BookmarksBinding by lazy { BookmarksBinding() }
 
     override val prepareToolbar: (ToolbarBuilder.() -> Unit) = {
-        /*addMenuItem(
+        addMenuItem(
             MenuItemHolder(
                 "Search",
                 R.id.action_search,
                 R.drawable.ic_search_black_24dp,
                 R.layout.search_view_layout
             )
-        )*/
+        )
     }
 
     private val articlesAdapter = ArticlesAdapter(
@@ -58,6 +62,48 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
         setHasOptionsMenu(true)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val menuItem = menu.findItem(R.id.action_search)
+        val searchView = menuItem.actionView as SearchView
+        if (binding.isSearch) {
+            menuItem.expandActionView()
+            searchView.setQuery(binding.searchQuery, false)
+
+            if (binding.isFocusedSearch) searchView.requestFocus()
+            else searchView.clearFocus()
+        }
+
+        menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                viewModel.handleSearchMode(true)
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                viewModel.handleSearchMode(false)
+                return true
+            }
+        })
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.handleSearch(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.handleSearch(newText)
+                return true
+            }
+        })
+
+        searchView.setOnCloseListener {
+            viewModel.handleSearchMode(false)
+            true
+        }
+    }
+
     override fun setupViews() {
         with(rv_bookmarks) {
             adapter = articlesAdapter
@@ -70,7 +116,7 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
     }
 
     inner class BookmarksBinding : Binding() {
-//        var isFocusedSearch = false
+        var isFocusedSearch = false
         var searchQuery: String? = null
         var isSearch = false
 
@@ -87,11 +133,13 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
 
         override fun saveUi(outState: Bundle) {
             outState.putBoolean("isSearch", isSearch)
+            outState.putBoolean("isFocusedSearch", isFocusedSearch)
             outState.putString("searchQuery", searchQuery)
         }
 
         override fun restoreUi(savedState: Bundle?) {
             isSearch = savedState?.getBoolean("isSearch") ?: false
+            isFocusedSearch = savedState?.getBoolean("isFocusedSearch") ?: false
             searchQuery = savedState?.getString("searchQuery")
         }
     }

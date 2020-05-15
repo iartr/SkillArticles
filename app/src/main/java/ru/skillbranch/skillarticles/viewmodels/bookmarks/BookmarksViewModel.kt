@@ -28,9 +28,8 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
     }
 
     private val listData: LiveData<PagedList<ArticleItemData>> = Transformations.switchMap(state) {
-//        if (it.isSearch && !it.searchQuery.isNullOrBlank()) buildPagedList(repository.searchArticles(it.searchQuery))
-//        else buildPagedList(repository.getBookmarksArticles())
-        buildPagedList(repository.getBookmarksArticles())
+        if (it.isSearch && !it.searchQuery.isNullOrBlank()) buildPagedList(repository.searchBookmarksArticles(it.searchQuery))
+        else buildPagedList(repository.getBookmarksArticles())
     }
 
     fun observeList(owner: LifecycleOwner, onChange: (list: PagedList<ArticleItemData>) -> Unit) {
@@ -40,6 +39,19 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
     fun handleToggleBookmark(id: String, checked: Boolean) {
         repository.updateBookmark(id, checked)
         listData.value?.dataSource?.invalidate()
+    }
+
+    fun handleSearch(query: String?) {
+        query ?: return
+        updateState {
+            it.copy(searchQuery = query)
+        }
+    }
+
+    fun handleSearchMode(isSearch: Boolean) {
+        updateState {
+            it.copy(isSearch = isSearch)
+        }
     }
 
     private fun buildPagedList(dataFactory: ArticlesDataFactory): LiveData<PagedList<ArticleItemData>> {

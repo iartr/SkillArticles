@@ -132,11 +132,13 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         override fun saveUi(outState: Bundle) {
             outState.putBoolean("isSearch", isSearch)
+            outState.putBoolean("isFocusedSearch", isFocusedSearch)
             outState.putString("searchQuery", searchQuery)
         }
 
         override fun restoreUi(savedState: Bundle?) {
             isSearch = savedState?.getBoolean("isSearch") ?: false
+            isFocusedSearch = savedState?.getBoolean("isFocusedSearch") ?: false
             searchQuery = savedState?.getString("searchQuery")
         }
     }

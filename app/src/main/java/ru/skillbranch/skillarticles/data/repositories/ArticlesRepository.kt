@@ -19,14 +19,32 @@ object ArticlesRepository {
     fun getBookmarksArticles(): ArticlesDataFactory {
         return ArticlesDataFactory(ArticleStrategy.BookmarkArticles { start, size ->
             local.localArticleItems
+                .asSequence()
                 .filter { it.isBookmark }
                 .drop(start)
                 .take(size)
+                .toList()
         })
     }
 
     fun searchArticles(searchQuery: String): ArticlesDataFactory {
         return ArticlesDataFactory(ArticleStrategy.SearchArticle(::searchArticlesByTitle, searchQuery))
+    }
+
+    fun searchBookmarksArticles(searchQuery: String): ArticlesDataFactory {
+        return ArticlesDataFactory(
+            ArticleStrategy.SearchBookmark(
+                itemProvider = { start, size, query ->
+                    local.localArticleItems
+                        .asSequence()
+                        .filter { it.isBookmark && it.title.contains(query, ignoreCase = true) }
+                        .drop(start)
+                        .take(size)
+                        .toList()
+                },
+                query = searchQuery
+            )
+        )
     }
 
     fun loadArticlesFromNetwork(start: Int, size: Int): List<ArticleItemData> {
@@ -49,8 +67,10 @@ object ArticlesRepository {
     }
 
     private fun findArticlesByRange(start: Int, size: Int) = local.localArticleItems
+        .asSequence()
         .drop(start)
         .take(size)
+        .toList()
 
     private fun searchArticlesByTitle(start: Int, size: Int, queryTitle: String): List<ArticleItemData> {
         return local.localArticleItems
@@ -103,6 +123,9 @@ sealed class ArticleStrategy {
         }
     }
 
-    // TODO — Bookmarks strategy
-
+    class SearchBookmark(private val itemProvider: (Int, Int, String) -> List<ArticleItemData>, private val query: String): ArticleStrategy() {
+        override fun getItems(start: Int, size: Int): List<ArticleItemData> {
+            return itemProvider(start, size, query)
+        }
+    }
 }

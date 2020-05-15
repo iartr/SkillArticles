@@ -44,7 +44,6 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment() 
             .build(root)
 
         viewModel.restoreState()
-        binding?.restoreUi(savedInstanceState)
 
         viewModel.observeState(viewLifecycleOwner) {
             binding?.bind(it)
@@ -61,6 +60,8 @@ abstract class BaseFragment<T: BaseViewModel<out IViewModelState>> : Fragment() 
         }
 
         setupViews()
+
+        binding?.restoreUi(savedInstanceState)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
