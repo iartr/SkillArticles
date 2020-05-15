@@ -8,10 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
-class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit) : PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
+class ArticlesAdapter(
+    private val listener: (ArticleItemData) -> Unit,
+    private val bookmarkListener: (String, Boolean) -> Unit
+) : PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val containerView = ArticleItemView(parent.context)
-        return ArticleVH(containerView)
+        return ArticleVH(containerView, bookmarkListener)
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
@@ -29,12 +33,14 @@ class ArticleDiffCallback: DiffUtil.ItemCallback<ArticleItemData>() {
     }
 }
 
-class ArticleVH(private val containerView: View): RecyclerView.ViewHolder(containerView) {
+class ArticleVH(
+    private val containerView: View,
+    private val bookmarkListener: (String, Boolean) -> Unit
+): RecyclerView.ViewHolder(containerView) {
     fun bind(item: ArticleItemData?, listener: (ArticleItemData) -> Unit) {
 
-        // При использовании placeholders item может быть пустым
         item?.let { notNullItem ->
-            (containerView as ArticleItemView).bind(notNullItem) { _, _ -> }
+            (containerView as ArticleItemView).bind(notNullItem, bookmarkListener)
             itemView.setOnClickListener { listener(notNullItem) }
         }
     }

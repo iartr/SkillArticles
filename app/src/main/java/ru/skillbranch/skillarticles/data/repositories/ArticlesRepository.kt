@@ -33,6 +33,12 @@ object ArticlesRepository {
             .apply { sleep(100) }
     }
 
+    fun updateBookmark(id: String, checked: Boolean) {
+        val index = local.localArticleItems.indexOfFirst { it.id == id }
+        if (index == -1) return
+        local.localArticleItems[index] = local.localArticleItems[index].copy(isBookmark = !checked)
+    }
+
     private fun findArticlesByRange(start: Int, size: Int) = local.localArticleItems
         .drop(start)
         .take(size)

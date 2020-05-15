@@ -47,6 +47,11 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
         }
     }
 
+    fun handleToggleBookmark(id: String, checked: Boolean) {
+        repository.updateBookmark(id, checked)
+        listData.value?.dataSource?.invalidate()
+    }
+
     private fun buildPagedList(dataFactory: ArticlesDataFactory): LiveData<PagedList<ArticleItemData>> {
         val builder = LivePagedListBuilder<Int, ArticleItemData>(dataFactory, listConfig)
 
