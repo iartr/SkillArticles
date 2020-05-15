@@ -118,6 +118,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         var isFocusedSearch = false
         var searchQuery: String? = null
         var isSearch = false
+
         var isLoading: Boolean by RenderProp(true) {
             // TODO: Show shimmer on rv_list
         }
@@ -129,6 +130,14 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             isLoading = data.isLoading
         }
 
-        // TODO: save ui
+        override fun saveUi(outState: Bundle) {
+            outState.putBoolean("isSearch", isSearch)
+            outState.putString("searchQuery", searchQuery)
+        }
+
+        override fun restoreUi(savedState: Bundle?) {
+            isSearch = savedState?.getBoolean("isSearch") ?: false
+            searchQuery = savedState?.getString("searchQuery")
+        }
     }
 }

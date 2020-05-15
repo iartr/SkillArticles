@@ -16,6 +16,15 @@ object ArticlesRepository {
         return ArticlesDataFactory(ArticleStrategy.AllArticles(::findArticlesByRange))
     }
 
+    fun getBookmarksArticles(): ArticlesDataFactory {
+        return ArticlesDataFactory(ArticleStrategy.BookmarkArticles { start, size ->
+            local.localArticleItems
+                .filter { it.isBookmark }
+                .drop(start)
+                .take(size)
+        })
+    }
+
     fun searchArticles(searchQuery: String): ArticlesDataFactory {
         return ArticlesDataFactory(ArticleStrategy.SearchArticle(::searchArticlesByTitle, searchQuery))
     }
@@ -85,6 +94,12 @@ sealed class ArticleStrategy {
     class SearchArticle(private val itemProvider: (Int, Int, String) -> List<ArticleItemData>, private val query: String): ArticleStrategy() {
         override fun getItems(start: Int, size: Int): List<ArticleItemData> {
             return itemProvider(start, size, query)
+        }
+    }
+
+    class BookmarkArticles(private val itemProvider: (Int, Int) -> List<ArticleItemData>): ArticleStrategy() {
+        override fun getItems(start: Int, size: Int): List<ArticleItemData> {
+            return itemProvider(start, size)
         }
     }
 
