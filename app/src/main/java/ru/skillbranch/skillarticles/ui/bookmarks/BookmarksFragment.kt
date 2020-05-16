@@ -69,9 +69,6 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
         if (binding.isSearch) {
             menuItem.expandActionView()
             searchView.setQuery(binding.searchQuery, false)
-
-            if (binding.isFocusedSearch) searchView.requestFocus()
-            else searchView.clearFocus()
         }
 
         menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
@@ -116,7 +113,6 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
     }
 
     inner class BookmarksBinding : Binding() {
-        var isFocusedSearch = false
         var searchQuery: String? = null
         var isSearch = false
 
@@ -129,18 +125,6 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
             isSearch = data.isSearch
             searchQuery = data.searchQuery
             isLoading = data.isLoading
-        }
-
-        override fun saveUi(outState: Bundle) {
-            outState.putBoolean("isSearch", isSearch)
-            outState.putBoolean("isFocusedSearch", isFocusedSearch)
-            outState.putString("searchQuery", searchQuery)
-        }
-
-        override fun restoreUi(savedState: Bundle?) {
-            isSearch = savedState?.getBoolean("isSearch") ?: false
-            isFocusedSearch = savedState?.getBoolean("isFocusedSearch") ?: false
-            searchQuery = savedState?.getString("searchQuery")
         }
     }
 }

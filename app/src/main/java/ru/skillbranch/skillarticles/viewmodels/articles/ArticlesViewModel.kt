@@ -93,7 +93,21 @@ data class ArticlesState(
     val isSearch: Boolean = false,
     val searchQuery: String? = null,
     val isLoading: Boolean = true
-): IViewModelState
+): IViewModelState {
+    override fun save(outState: SavedStateHandle) {
+        outState.set(::isSearch.name, isSearch)
+        outState.set(::searchQuery.name, searchQuery)
+        outState.set(::isLoading.name, isLoading)
+    }
+
+    override fun restore(savedState: SavedStateHandle): IViewModelState {
+        return this.copy(
+            isSearch = savedState.get<Boolean>(::isSearch.name) ?: false,
+            searchQuery = savedState.get<String>(::searchQuery.name),
+            isLoading = savedState.get<Boolean>(::isLoading.name) ?: true
+        )
+    }
+}
 
 class ArticlesBoundaryCallback(
     private val zeroLoadingHandle: () -> Unit,

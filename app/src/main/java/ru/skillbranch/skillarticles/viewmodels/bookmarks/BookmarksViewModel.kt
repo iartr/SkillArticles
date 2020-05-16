@@ -1,17 +1,11 @@
 package ru.skillbranch.skillarticles.viewmodels.bookmarks
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
-import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
 import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
-import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesBoundaryCallback
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import java.util.concurrent.Executors
@@ -65,4 +59,18 @@ data class BookmarksState(
     val isSearch: Boolean = false,
     val searchQuery: String? = null,
     val isLoading: Boolean = true
-) : IViewModelState
+) : IViewModelState {
+    override fun save(outState: SavedStateHandle) {
+        outState.set(::isSearch.name, isSearch)
+        outState.set(::searchQuery.name, searchQuery)
+        outState.set(::isLoading.name, isLoading)
+    }
+
+    override fun restore(savedState: SavedStateHandle): IViewModelState {
+        return this.copy(
+            isSearch = savedState.get<Boolean>(::isSearch.name) ?: false,
+            searchQuery = savedState.get<String>(::searchQuery.name),
+            isLoading = savedState.get<Boolean>(::isLoading.name) ?: true
+        )
+    }
+}
