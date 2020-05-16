@@ -23,8 +23,6 @@ class MarkdownContentView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
     private lateinit var elements: List<MarkdownElement>
-
-    //for restore
     private var layoutManager: LayoutManager = LayoutManager()
 
     var textSize by Delegates.observable(14f) { _, old, value ->
@@ -175,41 +173,38 @@ class MarkdownContentView @JvmOverloads constructor(
     }
 
     override fun onSaveInstanceState(): Parcelable? {
-        val savedState = SavedState(super.onSaveInstanceState())
-        savedState.layout = layoutManager
-        return savedState
+        val state = SavedState(super.onSaveInstanceState())
+        state.layout = layoutManager
+        return state
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        if (state is SavedState) layoutManager = state.layout
     }
 
     override fun dispatchSaveInstanceState(container: SparseArray<Parcelable>?) {
+        //save children manually without markdown text view
         children
             .filter { it !is MarkdownTextView }
-            .forEachIndexed { index, view ->
-                layoutManager.attachToParent(view, index)
-            }
-        children
-            .filter { it !is MarkdownTextView }
-            .forEach {
-                if (it !is MarkdownTextView) it.saveHierarchyState(layoutManager.container)
-            }
+            .forEach { it.saveHierarchyState(layoutManager.container) }
+
+        //save only markdownContentView
         dispatchFreezeSelfOnly(container)
     }
-
-    override fun onRestoreInstanceState(state: Parcelable) {
-        super.onRestoreInstanceState(state)
-        if (state is SavedState) layoutManager = state.layout
-        children
-            .filter { it !is MarkdownTextView }
-            .forEachIndexed { index, it -> layoutManager.attachToParent(it, index) }
-    }
-
 
     private class LayoutManager() : Parcelable {
         var ids: MutableList<Int> = mutableListOf()
         var container: SparseArray<Parcelable> = SparseArray()
 
         constructor(parcel: Parcel) : this() {
-            ids = parcel.readArrayList(Int::class.java.classLoader) as ArrayList<Int>
+            ids  = parcel.createIntArray()!!.toMutableList()
             container = parcel.readSparseArray<Parcelable>(this::class.java.classLoader) as SparseArray<Parcelable>
+        }
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            parcel.writeIntArray(ids.toIntArray())
+            parcel.writeSparseArray(container)
         }
 
         fun attachToParent(view: View, index: Int) {
@@ -222,20 +217,11 @@ class MarkdownContentView @JvmOverloads constructor(
             }
         }
 
-        override fun writeToParcel(parcel: Parcel, flags: Int) {
-            parcel.writeIntArray(ids.toIntArray())
-            parcel.writeSparseArray(container)
-        }
-
-        override fun describeContents() = 0
+        override fun describeContents(): Int = 0
 
         companion object CREATOR : Parcelable.Creator<LayoutManager> {
-            override fun createFromParcel(parcel: Parcel): LayoutManager {
-                return LayoutManager(parcel)
-            }
-            override fun newArray(size: Int): Array<LayoutManager?> {
-                return arrayOfNulls(size)
-            }
+            override fun createFromParcel(parcel: Parcel): LayoutManager = LayoutManager(parcel)
+            override fun newArray(size: Int): Array<LayoutManager?> = arrayOfNulls(size)
         }
     }
 
@@ -244,11 +230,14 @@ class MarkdownContentView @JvmOverloads constructor(
 
         constructor(superState: Parcelable?) : super(superState)
 
+        @Suppress("UNCHECKED_CAST")
         constructor(src: Parcel) : super(src) {
+            //restore state from parcel
             layout = src.readParcelable(LayoutManager::class.java.classLoader)!!
         }
 
         override fun writeToParcel(dst: Parcel, flags: Int) {
+            //write state to parcel
             super.writeToParcel(dst, flags)
             dst.writeParcelable(layout, flags)
         }
