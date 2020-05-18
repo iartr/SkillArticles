@@ -27,6 +27,7 @@ class ArticleViewModel(
     handle: SavedStateHandle,
     private val articleId: String
 ) : BaseViewModel<ArticleState>(handle, ArticleState()), IArticleViewModel {
+
     private val repository = ArticleRepository
     private var clearContent: String? = null
     private val listConfig by lazy {
@@ -164,12 +165,23 @@ class ArticleViewModel(
         notify(Notify.TextMessage("Code copy to clipboard"))
     }
 
-    fun handleSendComment(comment: String) {
-        if (!currentState.isAuth) navigate(NavigationCommand.StartLogin())
+    fun handleSendComment(comment: String?) {
+        updateState { it.copy(comment = comment) }
+
+        if (comment.isNullOrBlank()) {
+            notify(Notify.TextMessage("Comment must not be empty"))
+            return
+        }
+
+        if (!currentState.isAuth) {
+            navigate(NavigationCommand.StartLogin())
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendComment(articleId, comment, currentState.answerToSlug)
             withContext(Dispatchers.Main) {
-                updateState { it.copy(answerTo = null, answerToSlug = null) }
+                updateState { it.copy(answerTo = null, answerToSlug = null, comment = null) }
             }
         }
     }
@@ -222,10 +234,10 @@ data class ArticleState(
     val commentsCount: Int = 0,
     val answerTo: String? = null,
     val answerToSlug: String? = null,
-    val showBottomBar: Boolean = true
+    val showBottomBar: Boolean = true,
+    val comment: String? = null
 ): IViewModelState {
     override fun save(outState: SavedStateHandle) {
-        // TODO: save state
         outState.set("isSearch", isSearch)
         outState.set("searchQuery", searchQuery)
         outState.set("searchResults", searchResults)
@@ -233,7 +245,6 @@ data class ArticleState(
     }
 
     override fun restore(savedState: SavedStateHandle): IViewModelState {
-        // TODO: restore state
         return copy(
             isSearch = savedState["isSearch"] ?: false,
             searchQuery = savedState["searchQuery"],
