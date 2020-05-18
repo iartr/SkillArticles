@@ -1,6 +1,5 @@
 package ru.skillbranch.skillarticles
 
-import android.util.Log
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
@@ -10,7 +9,6 @@ import androidx.core.widget.NestedScrollView
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ScrollToAction
@@ -23,7 +21,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import junit.framework.Assert.assertEquals
-import kotlinx.android.synthetic.main.activity_root.*
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
