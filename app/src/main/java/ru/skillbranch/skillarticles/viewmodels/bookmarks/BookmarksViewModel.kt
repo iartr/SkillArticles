@@ -3,7 +3,7 @@ package ru.skillbranch.skillarticles.viewmodels.bookmarks
 import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import ru.skillbranch.skillarticles.data.models.ArticleItemData
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
@@ -21,12 +21,12 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
             .build()
     }
 
-    private val listData: LiveData<PagedList<ArticleItemData>> = Transformations.switchMap(state) {
+    private val listData: LiveData<PagedList<ArticleItem>> = Transformations.switchMap(state) {
         if (it.isSearch && !it.searchQuery.isNullOrBlank()) buildPagedList(repository.searchBookmarksArticles(it.searchQuery))
         else buildPagedList(repository.getBookmarksArticles())
     }
 
-    fun observeList(owner: LifecycleOwner, onChange: (list: PagedList<ArticleItemData>) -> Unit) {
+    fun observeList(owner: LifecycleOwner, onChange: (list: PagedList<ArticleItem>) -> Unit) {
         listData.observe(owner, Observer { onChange(it) })
     }
 
@@ -48,7 +48,7 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
         }
     }
 
-    private fun buildPagedList(dataFactory: ArticlesDataFactory): LiveData<PagedList<ArticleItemData>> {
+    private fun buildPagedList(dataFactory: ArticlesDataFactory): LiveData<PagedList<ArticleItem>> {
         return LivePagedListBuilder(dataFactory, listConfig)
             .setFetchExecutor(Executors.newSingleThreadExecutor())
             .build()

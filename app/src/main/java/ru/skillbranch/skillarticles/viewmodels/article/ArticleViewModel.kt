@@ -6,17 +6,14 @@ import androidx.paging.PagedList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.skillbranch.skillarticles.data.models.ArticleData
-import ru.skillbranch.skillarticles.data.models.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.models.CommentItemData
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.data.repositories.CommentsDataFactory
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
-import ru.skillbranch.skillarticles.extensions.data.toAppSettings
-import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
-import ru.skillbranch.skillarticles.extensions.indexesOf
 import ru.skillbranch.skillarticles.data.repositories.clearContent
-import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.extensions.data.toAppSettings
+import ru.skillbranch.skillarticles.extensions.indexesOf
+import ru.skillbranch.skillarticles.extensions.shortFormat
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
@@ -37,36 +34,24 @@ class ArticleViewModel(
             .build()
     }
 
-    private val listData: LiveData<PagedList<CommentItemData>> = Transformations.switchMap(getArticleData()) {
-        buildPagedList(repository.allComments(articleId, it?.commentCount ?: 0))
+    private val listData: LiveData<PagedList<CommentItemData>> = Transformations.switchMap(repository.fetchArticleCommentCount(articleId)) {
+        buildPagedList(repository.loadAllComments(articleId, it))
     }
 
     init {
-        subscribeOnDataSource(getArticleData()) { article, articleState ->
-            article ?: return@subscribeOnDataSource null
-            articleState.copy(
+        subscribeOnDataSource(repository.findArticle(articleId)) { article, state ->
+            if (article.content == null) fetchContent()
+            state.copy(
                 shareLink = article.shareLink,
                 title = article.title,
-                category = article.category,
-                categoryIcon = article.categoryIcon,
-                date = article.date.format(),
-                author = article.author
-            )
-        }
-
-        subscribeOnDataSource(getArticleContent()) { content, articleState ->
-            content ?: return@subscribeOnDataSource null
-            articleState.copy(
-                isLoadingContent = false,
-                content = content
-            )
-        }
-
-        subscribeOnDataSource(getArticlePersonalInfo()) { personalInfo, articleState ->
-            personalInfo ?: return@subscribeOnDataSource null
-            articleState.copy(
-                isLike = personalInfo.isLike,
-                isBookmark = personalInfo.isBookmark
+                category = article.category.title,
+                categoryIcon = article.category.icon,
+                date = article.date.shortFormat(),
+                author = article.author,
+                isBookmark = article.isBookmark,
+                isLike = article.isLike,
+                content = article.content ?: emptyList(),
+                isLoadingContent = article.content == null
             )
         }
 
@@ -82,19 +67,10 @@ class ArticleViewModel(
         }
     }
 
-    // load text from network
-    override fun getArticleContent(): LiveData<List<MarkdownElement>?> {
-        return repository.loadArticleContent(articleId)
-    }
-
-    // from db
-    override fun getArticleData(): LiveData<ArticleData?> {
-        return repository.getArticle(articleId)
-    }
-
-    // from db
-    override fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?> {
-        return repository.loadArticlePersonalInfo(articleId)
+    private fun fetchContent() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.fetchArticleContent(articleId)
+        }
     }
 
     override fun handleUpText() {
@@ -111,32 +87,40 @@ class ArticleViewModel(
     }
 
     override fun handleLike() {
-        val toggleLike = {
-            val info = currentState.toArticlePersonalInfo()
-            repository.updateArticlePersonalInfo(info.copy(isLike = !info.isLike))
+        val isLiked = currentState.isLike
+        val msg = if (!isLiked) Notify.TextMessage("Mark is liked")
+        else {
+            Notify.ActionMessage(
+                "Don't like it anymore",
+                "No, still like it"
+            ) { handleLike() }
         }
 
-        toggleLike()
-
-        val notify =
-            if (currentState.isLike) Notify.TextMessage("Mark is liked")
-            else Notify.ActionMessage("Don`t like it anymore", "No, still like it", toggleLike)
-
-        notify(notify)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.toggleLike(articleId)
+            if (isLiked) repository.decrementLike(articleId) else repository.incrementLike(articleId)
+            withContext(Dispatchers.Main) {
+                notify(msg)
+            }
+        }
     }
 
     override fun handleBookmark() {
-        val info = currentState.toArticlePersonalInfo()
-        repository.updateArticlePersonalInfo(info.copy(isBookmark = !info.isBookmark))
-
         val msg = if (currentState.isBookmark) "Add to bookmarks" else "Remove from bookmarks"
-        notify(Notify.TextMessage(msg))
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.toggleBookmark(articleId)
+            withContext(Dispatchers.Main) {
+                notify(Notify.TextMessage(msg))
+            }
+        }
     }
 
+    // not implemented
     override fun handleShare() {
         notify(Notify.ErrorMessage("Share is not implemented", "OK", null))
     }
 
+    // session state
     override fun handleToggleMenu() {
         updateState { it.copy(isShowMenu = !it.isShowMenu) }
     }
@@ -179,7 +163,7 @@ class ArticleViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            repository.sendComment(articleId, comment, currentState.answerToSlug)
+            repository.sendMessage(articleId, comment, currentState.answerToSlug)
             withContext(Dispatchers.Main) {
                 updateState { it.copy(answerTo = null, answerToSlug = null, comment = null) }
             }

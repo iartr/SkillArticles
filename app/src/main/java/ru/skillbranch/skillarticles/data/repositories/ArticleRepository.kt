@@ -2,59 +2,111 @@ package ru.skillbranch.skillarticles.data.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.ItemKeyedDataSource
-import ru.skillbranch.skillarticles.data.*
-import ru.skillbranch.skillarticles.data.models.*
+import ru.skillbranch.skillarticles.data.NetworkDataHolder
+import ru.skillbranch.skillarticles.data.local.DbManager.db
+import ru.skillbranch.skillarticles.data.local.PrefManager
+import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
+import ru.skillbranch.skillarticles.data.models.AppSettings
+import ru.skillbranch.skillarticles.data.models.CommentItemData
+import ru.skillbranch.skillarticles.data.models.User
+import ru.skillbranch.skillarticles.extensions.data.toArticleContent
 import java.lang.Thread.sleep
 import kotlin.math.abs
 
-object ArticleRepository {
-    private val local = LocalDataHolder
+interface IArticleRepository {
+    fun findArticle(articleId: String): LiveData<ArticleFull>
+    fun getAppSettings(): LiveData<AppSettings>
+    fun toggleLike(articleId: String)
+    fun toggleBookmark(articleId: String)
+    fun isAuth(): MutableLiveData<Boolean>
+    fun loadCommentByRange(slug: String?, size: Int, articleId: String): List<CommentItemData>
+    fun sendMessage(articleId: String, text: String, answerToSlug: String?)
+    fun loadAllComments(articleId: String, total: Int): CommentsDataFactory
+    fun decrementLike(articleId: String)
+    fun incrementLike(articleId: String)
+    fun updateSettings(copy: AppSettings)
+    fun fetchArticleContent(articleId: String)
+    fun fetchArticleCommentCount(articleId: String): LiveData<Int>
+}
+
+object ArticleRepository : IArticleRepository {
     private val network = NetworkDataHolder
+    private val preferences = PrefManager
+    private val articlesDao = db.articlesDao()
+    private val articlePersonalDao = db.articlePersonalInfosDao()
+    private val articleCountsDao = db.articleCountsDao()
+    private val articleContentDao = db.articleContentsDao()
 
-    fun loadArticleContent(articleId: String): LiveData<List<MarkdownElement>?> {
-        return Transformations.map(network.loadArticleContent(articleId)){
-            return@map  if(it == null) null
-            else MarkdownParser.parse(it)
-        }
-    }
-    fun getArticle(articleId: String): LiveData<ArticleData?> {
-        return local.findArticle(articleId) //2s delay from db
-    }
-
-    fun loadArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo?> {
-        return local.findArticlePersonalInfo(articleId) //1s delay from db
+    override fun findArticle(articleId: String): LiveData<ArticleFull> {
+        return articlesDao.findFullArticle(articleId)
     }
 
-    fun getAppSettings(): LiveData<AppSettings> = local.getAppSettings() //from preferences
-    fun updateSettings(appSettings: AppSettings) {
-        local.updateAppSettings(appSettings)
+    override fun getAppSettings(): LiveData<AppSettings> {
+        return preferences.getAppSettings()
     }
 
-    fun updateArticlePersonalInfo(info: ArticlePersonalInfo) {
-        local.updateArticlePersonalInfo(info)
+    override fun toggleLike(articleId: String) {
+        articlePersonalDao.toggleLikeOrInsert(articleId)
     }
 
-    fun isAuth(): MutableLiveData<Boolean> = local.isAuth()
-    fun allComments(articleId: String, totalCount: Int): CommentsDataFactory {
-        return CommentsDataFactory(::loadCommentsByRange, articleId, totalCount)
+    override fun toggleBookmark(articleId: String) {
+        articlePersonalDao.toggleBookmarkOrInsert(articleId)
     }
 
-    private fun loadCommentsByRange(slug: String?, size: Int, articleId: String): List<CommentItemData> {
+    override fun isAuth(): MutableLiveData<Boolean> {
+        return preferences.isAuth()
+    }
+
+    override fun updateSettings(copy: AppSettings) {
+        // TODO: implement me
+    }
+
+    override fun loadCommentByRange(slug: String?, size: Int, articleId: String): List<CommentItemData> {
         val data = network.commentsData.getOrElse(articleId) { mutableListOf() }
         return when {
             slug == null -> data.take(size)
             size > 0 -> data.dropWhile { it.slug != slug }.drop(1).take(size)
             size < 0 -> data.dropLastWhile { it.slug != slug }.dropLast(1).takeLast(abs(size))
             else -> emptyList()
-        }
+        }.apply { sleep(1500) }
     }
 
-    fun sendComment(articleId: String, comment: String, answerToSlug: String?) {
-        network.sendMessage(articleId, comment, answerToSlug, User("777", "John Doe", "https://miro.medium.com/fit/c/96/96/0*zhOjC9mtKiAzmBQo.png"))
-        local.incrementCommentsCount(articleId)
+    override fun sendMessage(articleId: String, text: String, answerToSlug: String?) {
+        network.sendMessage(
+            articleId,
+            text,
+            answerToSlug,
+            User("777", "John Doe", "https://i.ibb.co/C1n19hD/photo-2020-04-25-22-30-17.jpg")
+        )
+
+        articleCountsDao.incrementCommentsCount(articleId)
+    }
+
+    override fun loadAllComments(articleId: String, total: Int): CommentsDataFactory {
+        return CommentsDataFactory(
+            itemProvider = ::loadCommentByRange,
+            articleId = articleId,
+            totalCount = total
+        )
+    }
+
+    override fun decrementLike(articleId: String) {
+        articleCountsDao.decrementLike(articleId)
+    }
+
+    override fun incrementLike(articleId: String) {
+        articleCountsDao.incrementLike(articleId)
+    }
+
+    override fun fetchArticleContent(articleId: String) {
+        val content = network.loadArticleContent(articleId).apply { sleep(1500) }
+        articleContentDao.insert(content.toArticleContent())
+    }
+
+    override fun fetchArticleCommentCount(articleId: String): LiveData<Int> {
+        return articleCountsDao.getCommentsCount(articleId)
     }
 }
 

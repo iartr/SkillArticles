@@ -5,13 +5,13 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import ru.skillbranch.skillarticles.data.models.ArticleItemData
+import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(
-    private val listener: (ArticleItemData) -> Unit,
+    private val listener: (ArticleItem) -> Unit,
     private val bookmarkListener: (String, Boolean) -> Unit
-) : PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
+) : PagedListAdapter<ArticleItem, ArticleVH>(ArticleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val containerView = ArticleItemView(parent.context)
@@ -23,12 +23,12 @@ class ArticlesAdapter(
     }
 }
 
-class ArticleDiffCallback: DiffUtil.ItemCallback<ArticleItemData>() {
-    override fun areItemsTheSame(oldItem: ArticleItemData, newItem: ArticleItemData): Boolean {
+class ArticleDiffCallback: DiffUtil.ItemCallback<ArticleItem>() {
+    override fun areItemsTheSame(oldItem: ArticleItem, newItem: ArticleItem): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: ArticleItemData, newItem: ArticleItemData): Boolean {
+    override fun areContentsTheSame(oldItem: ArticleItem, newItem: ArticleItem): Boolean {
         return oldItem == newItem
     }
 }
@@ -37,7 +37,7 @@ class ArticleVH(
     private val containerView: View,
     private val bookmarkListener: (String, Boolean) -> Unit
 ): RecyclerView.ViewHolder(containerView) {
-    fun bind(item: ArticleItemData?, listener: (ArticleItemData) -> Unit) {
+    fun bind(item: ArticleItem?, listener: (ArticleItem) -> Unit) {
 
         item?.let { notNullItem ->
             (containerView as ArticleItemView).bind(notNullItem, bookmarkListener)
