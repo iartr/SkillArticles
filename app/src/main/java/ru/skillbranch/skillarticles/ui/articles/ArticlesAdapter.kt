@@ -9,13 +9,12 @@ import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
 class ArticlesAdapter(
-    private val listener: (ArticleItem) -> Unit,
-    private val bookmarkListener: (String, Boolean) -> Unit
+    private val listener: (ArticleItem, Boolean) -> Unit
 ) : PagedListAdapter<ArticleItem, ArticleVH>(ArticleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val containerView = ArticleItemView(parent.context)
-        return ArticleVH(containerView, bookmarkListener)
+        return ArticleVH(containerView)
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
@@ -33,15 +32,8 @@ class ArticleDiffCallback: DiffUtil.ItemCallback<ArticleItem>() {
     }
 }
 
-class ArticleVH(
-    private val containerView: View,
-    private val bookmarkListener: (String, Boolean) -> Unit
-): RecyclerView.ViewHolder(containerView) {
-    fun bind(item: ArticleItem?, listener: (ArticleItem) -> Unit) {
-
-        item?.let { notNullItem ->
-            (containerView as ArticleItemView).bind(notNullItem, bookmarkListener)
-            itemView.setOnClickListener { listener(notNullItem) }
-        }
+class ArticleVH(private val containerView: View): RecyclerView.ViewHolder(containerView) {
+    fun bind(item: ArticleItem?, listener: (ArticleItem, Boolean) -> Unit) {
+        (containerView as ArticleItemView).bind(item!!, listener)
     }
 }

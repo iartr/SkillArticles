@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
@@ -7,6 +8,10 @@ import androidx.paging.ItemKeyedDataSource
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
 import ru.skillbranch.skillarticles.data.local.DbManager.db
 import ru.skillbranch.skillarticles.data.local.PrefManager
+import ru.skillbranch.skillarticles.data.local.dao.ArticleContentsDao
+import ru.skillbranch.skillarticles.data.local.dao.ArticleCountsDao
+import ru.skillbranch.skillarticles.data.local.dao.ArticlePersonalInfosDao
+import ru.skillbranch.skillarticles.data.local.dao.ArticlesDao
 import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
 import ru.skillbranch.skillarticles.data.models.AppSettings
 import ru.skillbranch.skillarticles.data.models.CommentItemData
@@ -28,16 +33,17 @@ interface IArticleRepository {
     fun incrementLike(articleId: String)
     fun updateSettings(copy: AppSettings)
     fun fetchArticleContent(articleId: String)
-    fun fetchArticleCommentCount(articleId: String): LiveData<Int>
+    fun findArticleCommentCount(articleId: String): LiveData<Int>
 }
 
 object ArticleRepository : IArticleRepository {
     private val network = NetworkDataHolder
     private val preferences = PrefManager
-    private val articlesDao = db.articlesDao()
-    private val articlePersonalDao = db.articlePersonalInfosDao()
-    private val articleCountsDao = db.articleCountsDao()
-    private val articleContentDao = db.articleContentsDao()
+
+    private var articlesDao = db.articlesDao()
+    private var articlePersonalDao = db.articlePersonalInfosDao()
+    private var articleCountsDao = db.articleCountsDao()
+    private var articleContentDao = db.articleContentsDao()
 
     override fun findArticle(articleId: String): LiveData<ArticleFull> {
         return articlesDao.findFullArticle(articleId)
@@ -105,8 +111,21 @@ object ArticleRepository : IArticleRepository {
         articleContentDao.insert(content.toArticleContent())
     }
 
-    override fun fetchArticleCommentCount(articleId: String): LiveData<Int> {
+    override fun findArticleCommentCount(articleId: String): LiveData<Int> {
         return articleCountsDao.getCommentsCount(articleId)
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupTestDao(
+        articlesDao: ArticlesDao,
+        articleCountsDao: ArticleCountsDao,
+        articleContentDao: ArticleContentsDao,
+        articlePersonalDao: ArticlePersonalInfosDao
+    ) {
+        this.articlesDao = articlesDao
+        this.articleContentDao = articleContentDao
+        this.articleCountsDao = articleCountsDao
+        this.articlePersonalDao = articlePersonalDao
     }
 }
 
