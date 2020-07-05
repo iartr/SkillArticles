@@ -1,13 +1,16 @@
 package ru.skillbranch.skillarticles.ui.articles
 
+import android.content.res.ColorStateList
 import android.database.Cursor
 import android.database.MatrixCursor
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.BaseColumns
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.widget.SearchView
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.cursoradapter.widget.CursorAdapter
 import androidx.cursoradapter.widget.SimpleCursorAdapter
 import androidx.fragment.app.activityViewModels
@@ -200,7 +203,13 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         var categories: List<CategoryData> = emptyList()
         var selectedCategories: List<String> by RenderProp(emptyList()) {
-            //TODO: selected color on icon
+            var drawable = toolbar.menu?.findItem(R.id.action_filter)?.icon ?: return@RenderProp
+            drawable = DrawableCompat.wrap(drawable)
+
+            if (it.isNotEmpty()) DrawableCompat.setTint(drawable, resources.getColor(R.color.color_accent, null))
+            else DrawableCompat.setTint(drawable, resources.getColor(R.color.color_on_article_bar, null))
+
+            toolbar.menu.findItem(R.id.action_filter).icon = drawable
         }
 
         override fun bind(data: IViewModelState) {
