@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.android.parcel.Parcelize
+import ru.skillbranch.skillarticles.ui.dialogs.CategoryDataItem
 
 @Entity(tableName = "article_categories")
 data class Category(
@@ -28,4 +29,8 @@ data class CategoryData(
 
     @ColumnInfo(name = "articles_count")
     val articlesCount: Int = 0
-) : Parcelable
+) : Parcelable {
+
+    // IT IS BAD SOLUTION
+    fun toCategoryDataItem(checked: Boolean = false) = CategoryDataItem(categoryId, icon, title, articlesCount, checked)
+}
