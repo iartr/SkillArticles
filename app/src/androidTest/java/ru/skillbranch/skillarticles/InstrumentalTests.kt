@@ -631,7 +631,8 @@ class InstrumentalTest1 {
             isBookmark = false,
             isLike = false,
             date = expectedArticleRes.data.date,
-            content = null
+            content = null,
+            tags = emptyList()
         )
 
 
