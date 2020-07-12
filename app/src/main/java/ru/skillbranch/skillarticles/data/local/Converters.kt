@@ -19,3 +19,8 @@ class MarkdownConverter {
         return content?.let { MarkdownParser.parse(it) }
     }
 }
+
+class ListConverter {
+    @TypeConverter
+    fun toList(str: String?): List<String> = str?.split(",") ?: emptyList()
+}
