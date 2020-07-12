@@ -25,13 +25,13 @@ interface IArticleRepository {
     fun getAppSettings(): LiveData<AppSettings>
     fun toggleLike(articleId: String)
     fun toggleBookmark(articleId: String)
-    fun isAuth(): MutableLiveData<Boolean>
+    fun isAuth(): LiveData<Boolean>
     fun loadCommentByRange(slug: String?, size: Int, articleId: String): List<CommentItemData>
     fun sendMessage(articleId: String, text: String, answerToSlug: String?)
     fun loadAllComments(articleId: String, total: Int): CommentsDataFactory
     fun decrementLike(articleId: String)
     fun incrementLike(articleId: String)
-    fun updateSettings(copy: AppSettings)
+    fun updateSettings(settings: AppSettings)
     fun fetchArticleContent(articleId: String)
     fun findArticleCommentCount(articleId: String): LiveData<Int>
 }
@@ -50,7 +50,7 @@ object ArticleRepository : IArticleRepository {
     }
 
     override fun getAppSettings(): LiveData<AppSettings> {
-        return preferences.getAppSettings()
+        return preferences.appSettings
     }
 
     override fun toggleLike(articleId: String) {
@@ -61,12 +61,12 @@ object ArticleRepository : IArticleRepository {
         articlePersonalDao.toggleBookmarkOrInsert(articleId)
     }
 
-    override fun isAuth(): MutableLiveData<Boolean> {
-        return preferences.isAuth()
+    override fun isAuth(): LiveData<Boolean> {
+        return preferences.isAuthLiveData
     }
 
-    override fun updateSettings(copy: AppSettings) {
-        // TODO: implement me
+    override fun updateSettings(settings: AppSettings) {
+        preferences.updateSettings(settings)
     }
 
     override fun loadCommentByRange(slug: String?, size: Int, articleId: String): List<CommentItemData> {

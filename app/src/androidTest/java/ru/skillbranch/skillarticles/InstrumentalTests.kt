@@ -31,7 +31,6 @@ import ru.skillbranch.skillarticles.extensions.data.toArticleCounts
 import java.lang.Thread.sleep
 import java.util.*
 
-
 @RunWith(AndroidJUnit4::class)
 class InstrumentalTest1 {
     @get:Rule
