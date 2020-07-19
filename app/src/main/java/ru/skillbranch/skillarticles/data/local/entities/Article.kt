@@ -109,7 +109,7 @@ data class ArticleFull(
 
     val source: String? = null,
 
-    val tags: List<String>
+    val tags: List<String> = emptyList()
 )
 
 data class ArticleWithShareLink(
