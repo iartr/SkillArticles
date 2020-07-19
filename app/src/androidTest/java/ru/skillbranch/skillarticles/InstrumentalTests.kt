@@ -1,11 +1,12 @@
 package ru.skillbranch.skillarticles
 
+/*//region Tests for hometask_9
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.paging.DataSource
 import androidx.room.Room
 import androidx.room.paging.LimitOffsetDataSource
 import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.test.ext.junit.runners.AndroidJUnit4
+
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jraska.livedata.TestObserver
 import junit.framework.Assert.assertEquals
@@ -13,7 +14,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
 import ru.skillbranch.skillarticles.data.local.AppDb
 import ru.skillbranch.skillarticles.data.local.MarkdownConverter
@@ -30,9 +30,18 @@ import ru.skillbranch.skillarticles.extensions.data.toArticleContent
 import ru.skillbranch.skillarticles.extensions.data.toArticleCounts
 import java.lang.Thread.sleep
 import java.util.*
+//endregion*/
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class InstrumentalTest1 {
+    fun hello() {
+
+    }
+
+    /*
+    //region Tests for hometask_9
     @get:Rule
     var testRule = InstantTaskExecutorRule()
     private lateinit var testDb: AppDb
@@ -789,11 +798,13 @@ class InstrumentalTest1 {
             .assertHasValue()
             .assertValueHistory(false,true)
     }
+    //endregion
+    */
 }
 
-private fun <Key, T> DataSource.Factory<Key, T>.toTestList(
+/*private fun <Key, T> DataSource.Factory<Key, T>.toTestList(
     start: Int = 0,
     size: Int = 10
 ): List<T> {
     return (this.create() as LimitOffsetDataSource<T>).loadRange(start, size).toList()
-}
+}*/
