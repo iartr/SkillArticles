@@ -1,9 +1,7 @@
 package ru.skillbranch.skillarticles.data.delegates
 
-import android.content.SharedPreferences
-import androidx.lifecycle.LiveData
+import com.squareup.moshi.JsonAdapter
 import ru.skillbranch.skillarticles.data.local.PrefManager
-import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -13,10 +11,10 @@ class PrefDelegate<T>(private val defaultValue: T) {
     operator fun provideDelegate(
         thisRef: PrefManager,
         prop: KProperty<*>
-    ): ReadWriteProperty<PrefManager, T?> {
+    ): ReadWriteProperty<PrefManager, T> {
         val key = prop.name
-        return object : ReadWriteProperty<PrefManager, T?> {
-            override fun getValue(thisRef: PrefManager, property: KProperty<*>): T? {
+        return object : ReadWriteProperty<PrefManager, T> {
+            override fun getValue(thisRef: PrefManager, property: KProperty<*>): T {
                 if (storedValue == null) {
                     @Suppress("UNCHECKED_CAST")
                     storedValue = when (defaultValue) {
@@ -31,10 +29,10 @@ class PrefDelegate<T>(private val defaultValue: T) {
                         else -> error("This type can not be stored into Preferences")
                     }
                 }
-                return storedValue
+                return storedValue!!
             }
 
-            override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T?) {
+            override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T) {
                 with(thisRef.preferences.edit()) {
                     when (value) {
                         is String -> putString(key, value)
@@ -51,58 +49,33 @@ class PrefDelegate<T>(private val defaultValue: T) {
 
         }
     }
-
 }
 
-class PrefLiveDelegate<T>(private val defaultValue: T, private val fieldKey: String? = null) {
-    private lateinit var storedValue: LiveData<T>
+class PrefObjDelegate<T>(private val adapter: JsonAdapter<T>){
+    private var storedValue: T? = null
 
     operator fun provideDelegate(
         thisRef: PrefManager,
         prop: KProperty<*>
-    ): ReadOnlyProperty<PrefManager, LiveData<T>> {
-        val key = fieldKey ?: prop.name
-        return object : ReadOnlyProperty<PrefManager, LiveData<T>> {
-            override fun getValue(thisRef: PrefManager, property: KProperty<*>): LiveData<T> {
-                if (!::storedValue.isInitialized) storedValue =
-                    SharedPreferenceLiveData(thisRef.preferences, key, defaultValue)
+    ): ReadWriteProperty<PrefManager, T?> {
+        val key = prop.name
+        return object : ReadWriteProperty<PrefManager, T?>{
+            override fun getValue(thisRef: PrefManager, property: KProperty<*>): T? {
+                if(storedValue == null){
+                    storedValue = thisRef.preferences.getString(key, null)
+                        ?.let { adapter.fromJson(it) }
+                }
                 return storedValue
             }
-        }
-    }
-}
 
-internal class SharedPreferenceLiveData<T>(
-    var sharedPrefs: SharedPreferences,
-    var key: String,
-    var defValue: T
-) : LiveData<T>() {
-    private val preferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, shKey ->
-            if (shKey == key) {
-                value = readValue(defValue)
+            override fun setValue(thisRef: PrefManager, property: KProperty<*>, value: T?) {
+                storedValue = value
+                with(thisRef.preferences.edit()){
+                    putString(key, value?.let { adapter.toJson(it) })
+                    apply()
+                }
             }
-        }
 
-    override fun onActive() {
-        super.onActive()
-        value = readValue(defValue)
-        sharedPrefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-    }
-
-    override fun onInactive() {
-        sharedPrefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
-        super.onInactive()
-    }
-
-    private fun readValue(defaultValue: T): T {
-        return when (defaultValue) {
-            is Int -> sharedPrefs.getInt(key, defaultValue as Int) as T
-            is Long -> sharedPrefs.getLong(key, defaultValue as Long) as T
-            is Float -> sharedPrefs.getFloat(key, defaultValue as Float) as T
-            is String -> sharedPrefs.getString(key, defaultValue as String) as T
-            is Boolean -> sharedPrefs.getBoolean(key, defaultValue as Boolean) as T
-            else -> error("This type can not be stored into Preferences")
         }
     }
 }
