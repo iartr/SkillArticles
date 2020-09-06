@@ -59,7 +59,6 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     override val binding: ArticleBinding by lazy { ArticleBinding() }
 
     override val prepareToolbar: (ToolbarBuilder.() -> Unit) = {
-        setTitle(args.title)
         setSubtitle(args.category)
         setLogo(args.categoryIcon)
         addMenuItem(

@@ -84,6 +84,7 @@ class CategoryVH(
 ) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind(item: CategoryDataItem) {
+        containerView.ch_select.setOnCheckedChangeListener(null)
         containerView.ch_select.isChecked = item.isChecked
         Glide.with(containerView.context)
             .load(item.icon)

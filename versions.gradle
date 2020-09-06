@@ -6,6 +6,9 @@ ext {
     lifecycle_version = "2.2.0"
     pref_ktx_version = "1.1.1"
     glide_version = "4.11.0"
-    material_version = "1.2.0"
+    material_version = "1.2.1"
     room_version = "2.2.5"
+    retofit_version ="2.9.0"
+    okhttp_version ="4.8.1"
+    moshi_version ="1.9.3"
 }
