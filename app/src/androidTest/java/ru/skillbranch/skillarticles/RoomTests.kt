@@ -1,3 +1,4 @@
+/*
 package ru.skillbranch.skillarticles
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -610,3 +611,4 @@ private fun <Key, T> DataSource.Factory<Key, T>.toTestList(
 ): List<T> {
     return (this.create() as LimitOffsetDataSource<T>).loadRange(start, size).toList()
 }
+*/

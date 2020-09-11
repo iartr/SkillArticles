@@ -231,6 +231,10 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         viewModel.observeList(viewLifecycleOwner) {
             commentsAdapter.submitList(it)
         }
+
+        refresh.setOnRefreshListener {
+            viewModel.refresh()
+        }
     }
 
     override fun showSearchBar() {
