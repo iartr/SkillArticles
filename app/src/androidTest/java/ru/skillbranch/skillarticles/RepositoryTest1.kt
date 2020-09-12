@@ -30,7 +30,7 @@ class RepositoryTest1 {
         @BeforeClass
         @JvmStatic
         fun setup() {
-            AppConfig.BASE_URL = "http://localhost:8080/"
+            AppConfig.BASE_URL = "https://localhost:8080/"
         }
     }
 

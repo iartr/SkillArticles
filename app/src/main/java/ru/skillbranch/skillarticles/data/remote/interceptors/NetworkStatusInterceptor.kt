@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.data.remote.interceptor
+package ru.skillbranch.skillarticles.data.remote.interceptors
 
 import okhttp3.Interceptor
 import okhttp3.Response

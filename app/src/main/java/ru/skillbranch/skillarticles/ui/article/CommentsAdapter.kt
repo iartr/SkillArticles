@@ -6,8 +6,6 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_comment.view.*
-import ru.skillbranch.skillarticles.data.models.CommentItemData
 import ru.skillbranch.skillarticles.data.remote.res.CommentRes
 import ru.skillbranch.skillarticles.ui.custom.CommentItemView
 

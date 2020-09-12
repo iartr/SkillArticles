@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.data.remote.interceptor
+package ru.skillbranch.skillarticles.data.remote.interceptors
 
 import com.squareup.moshi.JsonEncodingException
 import okhttp3.Interceptor

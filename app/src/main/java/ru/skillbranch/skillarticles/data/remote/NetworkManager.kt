@@ -6,9 +6,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.skillbranch.skillarticles.AppConfig
 import ru.skillbranch.skillarticles.data.JsonConverter.moshi
-import ru.skillbranch.skillarticles.data.remote.interceptor.ErrorStatusInterceptor
-import ru.skillbranch.skillarticles.data.remote.interceptor.NetworkStatusInterceptor
-import ru.skillbranch.skillarticles.data.remote.interceptor.TokenAuthenticator
+import ru.skillbranch.skillarticles.data.remote.interceptors.ErrorStatusInterceptor
+import ru.skillbranch.skillarticles.data.remote.interceptors.NetworkStatusInterceptor
+import ru.skillbranch.skillarticles.data.remote.interceptors.TokenAuthenticator
 import java.util.concurrent.TimeUnit
 
 object NetworkManager {
