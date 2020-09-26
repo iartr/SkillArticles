@@ -18,9 +18,13 @@ abstract class BaseViewModel<T : IViewModelState>(
     private val handleState: SavedStateHandle,
     initState: T
 ) : ViewModel() {
-    private val notifications = MutableLiveData<Event<Notify>>()
-    private val loading = MutableLiveData<Loading>(Loading.HIDE_LOADING)
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    val notifications = MutableLiveData<Event<Notify>>()
+    private val loading = MutableLiveData(Loading.HIDE_LOADING)
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val navigation = MutableLiveData<Event<NavigationCommand>>()
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    val permissions = MutableLiveData<Event<List<String>>>()
 
     /***
      * Инициализация начального состояния аргументом конструктоа, и объявления состояния как
@@ -43,7 +47,8 @@ abstract class BaseViewModel<T : IViewModelState>(
      * модифицированное состояние, которое присваивается текущему состоянию
      */
     @UiThread
-    protected inline fun updateState(update: (currentState: T) -> T) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    inline fun updateState(update: (currentState: T) -> T) {
         val updatedState: T = update(currentState)
         state.value = updatedState
     }
@@ -104,6 +109,14 @@ abstract class BaseViewModel<T : IViewModelState>(
 
     fun observeNavigation(owner: LifecycleOwner, onNavigate: (navigationCommand: NavigationCommand) -> Unit) {
         navigation.observe(owner, EventObserver { onNavigate(it) })
+    }
+
+    fun requestPermissions(requestedPermissions: List<String>) {
+        permissions.value = Event(requestedPermissions)
+    }
+
+    fun observerPermissions(owner: LifecycleOwner, handle: (permissions: List<String>) -> Unit) {
+        permissions.observe(owner, EventObserver { handle(it) })
     }
 
     /***

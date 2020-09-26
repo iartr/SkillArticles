@@ -1,12 +1,10 @@
 ext {
-    kotlin_version = "1.4.0"
+    kotlin_version = "1.4.10"
     navigation_version = "2.3.0"
     gradle_version = '4.0.1'
     paging_version = "2.1.2"
     lifecycle_version = "2.2.0"
-    pref_ktx_version = "1.1.1"
     glide_version = "4.11.0"
-    material_version = "1.2.1"
     room_version = "2.2.5"
     retofit_version ="2.9.0"
     okhttp_version ="4.8.1"

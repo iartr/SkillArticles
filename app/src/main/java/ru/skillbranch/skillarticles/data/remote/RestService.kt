@@ -1,7 +1,10 @@
 package ru.skillbranch.skillarticles.data.remote
 
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.*
+import ru.skillbranch.skillarticles.data.models.User
+import ru.skillbranch.skillarticles.data.remote.req.EditProfileReq
 import ru.skillbranch.skillarticles.data.remote.req.LoginReq
 import ru.skillbranch.skillarticles.data.remote.req.MessageReq
 import ru.skillbranch.skillarticles.data.remote.req.RefreshReq
@@ -76,5 +79,18 @@ interface RestService {
 
     @POST("auth/refresh")
     fun refreshAccessToken(@Body refresh: RefreshReq): Call<RefreshRes>
+
+    @POST("profile/avatar/upload")
+    @Multipart
+    suspend fun upload(
+        @Part file: MultipartBody.Part,
+        @Header("Authorization") token: String
+    ): UploadRes
+
+    @PUT("profile/avatar/remove")
+    suspend fun removeProfileAvatar(@Header("Authorization") auth: String): UploadRes
+
+    @PUT("profile")
+    suspend fun editProfile(@Body editProfileReq: EditProfileReq, @Header("Authorization") auth: String): User
 
 }

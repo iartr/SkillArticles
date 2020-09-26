@@ -31,16 +31,15 @@ import ru.skillbranch.skillarticles.extensions.data.toArticleCounts
 import java.lang.Thread.sleep
 import java.util.*
 //endregion*/
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.runner.RunWith
 
+/*
 @RunWith(AndroidJUnit4::class)
 class InstrumentalTest1 {
     fun hello() {
 
     }
 
-    /*
+
     //region Tests for hometask_9
     @get:Rule
     var testRule = InstantTaskExecutorRule()
@@ -799,9 +798,9 @@ class InstrumentalTest1 {
             .assertValueHistory(false,true)
     }
     //endregion
-    */
-}
 
+}
+*/
 /*private fun <Key, T> DataSource.Factory<Key, T>.toTestList(
     start: Int = 0,
     size: Int = 10

@@ -1,27 +1,21 @@
 package ru.skillbranch.skillarticles.ui.dialogs
 
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_category_dialog.view.*
 import ru.skillbranch.skillarticles.R
-import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 
 class ChoseCategoryDialog : DialogFragment() {
-    private val viewModel: ArticlesViewModel by activityViewModels()
+    companion object {
+        const val CHOOSE_CATEGORY_KEY = "CHOOSE_CATEGORY_KEY"
+        const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
+    }
+
     private val selectedCategories = mutableListOf<String>()
     private val args: ChoseCategoryDialogArgs by navArgs()
     private val categoryAdapter = CategoryAdapter { categoryId: String, isChecked: Boolean ->
@@ -42,11 +36,11 @@ class ChoseCategoryDialog : DialogFragment() {
         return AlertDialog.Builder(requireContext())
             .setView(listView)
             .setTitle("Chose category")
-            .setPositiveButton("Apply") { dialog: DialogInterface?, which: Int ->
-                viewModel.applyCategories(selectedCategories)
+            .setPositiveButton("Apply") { _, _ ->
+                setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to selectedCategories))
             }
             .setNegativeButton("Reset") { _, _ ->
-                viewModel.applyCategories(emptyList())
+                setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to emptyList<String>()))
             }
             .create()
     }
