@@ -59,11 +59,12 @@ abstract class BaseViewModel<T : IViewModelState>(
      * повторно
      */
     @UiThread
-    protected fun notify(content: Notify) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    fun notify(content: Notify) {
         notifications.value = Event(content)
     }
 
-    /***
+    /**
      * отображение индикатора загрузки (по умолчанию не блокирующий loading)
      */
     protected fun showLoading(loadingType: Loading = Loading.SHOW_LOADING) {
